@@ -1,11 +1,11 @@
 {
-  "app_version": "5.0.0",
+  "app_version": "5.1.0",
   "datasets": {
     "macro": {
       "status": "success",
       "rows": 168,
-      "started_at": "2026-07-21T14:56:45+08:00",
-      "finished_at": "2026-07-21T14:57:55+08:00",
+      "started_at": "2026-07-21T16:31:06+08:00",
+      "finished_at": "2026-07-21T16:31:24+08:00",
       "latest_date": "202606",
       "total_cached_rows": 168,
       "source_details": {
@@ -37,7 +37,7 @@
           }
         },
         "messages": [
-          "人民银行社融存量部分年份失败: 2022: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2022ntjsj/shrzgm/index.html') | 2023: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2023ntjsj/shrzgm/index.html') | 2024: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2024ntjsj/shrzgm/index.html') | 2025: ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='www.pbc.gov.cn', port=443): Read timed out. (read timeout=25)\"))"
+          "人民银行社融存量部分年份失败: 2022: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2022ntjsj/shrzgm/index.html') | 2023: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2023ntjsj/shrzgm/index.html') | 2024: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2024ntjsj/shrzgm/index.html') | 2025: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2025ntjsj/shrzgm/index.html')"
         ]
       },
       "cached_rows": 168
@@ -45,8 +45,8 @@
     "liquidity": {
       "status": "success",
       "rows": 4941,
-      "started_at": "2026-07-21T14:57:55+08:00",
-      "finished_at": "2026-07-21T14:58:31+08:00",
+      "started_at": "2026-07-21T16:31:24+08:00",
+      "finished_at": "2026-07-21T16:31:42+08:00",
       "latest_date": "20260721",
       "total_cached_rows": 4941,
       "source_details": {
@@ -66,16 +66,36 @@
     },
     "market": {
       "status": "success",
-      "rows": 26111,
-      "started_at": "2026-07-21T14:58:31+08:00",
-      "finished_at": "2026-07-21T14:59:04+08:00",
+      "rows": 32450,
+      "started_at": "2026-07-21T16:31:42+08:00",
+      "finished_at": "2026-07-21T16:31:53+08:00",
       "latest_date": "20260721",
-      "total_cached_rows": 26111,
+      "total_cached_rows": 32451,
       "symbols": {
+        "000001.SH": {
+          "status": "success",
+          "rows": 1585,
+          "source": "新浪财经 / AKShare"
+        },
+        "399001.SZ": {
+          "status": "success",
+          "rows": 1585,
+          "source": "新浪财经 / AKShare"
+        },
+        "399006.SZ": {
+          "status": "success",
+          "rows": 1585,
+          "source": "新浪财经 / AKShare"
+        },
+        "000300.SH": {
+          "status": "success",
+          "rows": 1585,
+          "source": "新浪财经 / AKShare"
+        },
         "000688.SH": {
           "status": "success",
-          "rows": 1586,
-          "source": "中证指数官网 / AKShare"
+          "rows": 1585,
+          "source": "新浪财经 / AKShare"
         },
         "931087.CSI": {
           "status": "success",
@@ -153,20 +173,20 @@
           "source": "Yahoo Finance / yfinance"
         }
       },
-      "cached_rows": 26111
+      "cached_rows": 32451
     },
     "global_macro": {
       "status": "failed",
       "rows": 0,
-      "started_at": "2026-07-21T14:59:04+08:00",
-      "finished_at": "2026-07-21T15:01:08+08:00",
+      "started_at": "2026-07-21T16:31:53+08:00",
+      "finished_at": "2026-07-21T16:33:57+08:00",
       "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=40)\"))"
     },
     "valuation": {
       "status": "success",
       "rows": 23248,
-      "started_at": "2026-07-21T15:01:08+08:00",
-      "finished_at": "2026-07-21T15:01:49+08:00",
+      "started_at": "2026-07-21T16:33:57+08:00",
+      "finished_at": "2026-07-21T16:34:27+08:00",
       "latest_date": "20260720",
       "total_cached_rows": 23248,
       "indices": {
@@ -207,37 +227,89 @@
       "cached_rows": 23248
     },
     "sentiment": {
-      "status": "partial",
-      "rows": 0,
-      "started_at": "2026-07-21T15:01:49+08:00",
-      "finished_at": "2026-07-21T15:01:49+08:00",
-      "latest_date": null,
-      "total_cached_rows": 0,
-      "skipped": true,
-      "note": "A股收盘情绪指标仅在北京时间交易日15:20后追加。"
+      "status": "success",
+      "rows": 2,
+      "started_at": "2026-07-21T16:34:27+08:00",
+      "finished_at": "2026-07-21T16:36:16+08:00",
+      "latest_date": "20260721",
+      "crowding_cached_rows": 1,
+      "breadth_cached_rows": 1,
+      "leverage": {
+        "status": "success",
+        "rows": 1,
+        "latest_date": "20260720",
+        "source": "上交所融资融券汇总 + 深交所融资融券汇总"
+      },
+      "source": "新浪沪深京A股实时行情 / AKShare",
+      "snapshot_kind": "收盘后快照"
     },
     "deviation": {
       "status": "success",
-      "rows": 336,
-      "started_at": "2026-07-21T15:01:49+08:00",
-      "finished_at": "2026-07-21T15:01:49+08:00",
-      "latest_date": "20260724",
-      "total_cached_rows": 336,
+      "rows": 1680,
+      "started_at": "2026-07-21T16:36:16+08:00",
+      "finished_at": "2026-07-21T16:36:16+08:00",
+      "latest_date": "20260720",
+      "total_cached_rows": 1680,
       "method": "(指数收盘/10周或20周均线-1)×100%",
-      "cached_rows": 336
+      "indices": {
+        "000001.SH": {
+          "status": "success",
+          "rows": 336,
+          "latest_date": "20260720"
+        },
+        "399001.SZ": {
+          "status": "success",
+          "rows": 336,
+          "latest_date": "20260720"
+        },
+        "399006.SZ": {
+          "status": "success",
+          "rows": 336,
+          "latest_date": "20260720"
+        },
+        "000688.SH": {
+          "status": "success",
+          "rows": 336,
+          "latest_date": "20260720"
+        },
+        "000300.SH": {
+          "status": "success",
+          "rows": 336,
+          "latest_date": "20260720"
+        }
+      },
+      "cached_rows": 1680
     },
     "fund_subscription": {
       "status": "success",
       "rows": 300,
-      "started_at": "2026-07-21T15:01:49+08:00",
-      "finished_at": "2026-07-21T15:01:56+08:00",
-      "latest_date": "20260707",
+      "started_at": "2026-07-21T16:36:16+08:00",
+      "finished_at": "2026-07-21T16:36:22+08:00",
+      "latest_date": "20260715",
       "total_cached_rows": 300,
       "note": "公开字段为募集份额（亿份）；按基金常见初始面值1元/份近似展示募集规模（亿元），并非基金存续期每日净申购额。",
       "cached_rows": 300
+    },
+    "crowding": {
+      "status": "cached",
+      "rows": 0,
+      "cached_rows": 1,
+      "latest_date": "20260721"
+    },
+    "breadth": {
+      "status": "cached",
+      "rows": 0,
+      "cached_rows": 1,
+      "latest_date": "20260721"
+    },
+    "leverage": {
+      "status": "cached",
+      "rows": 0,
+      "cached_rows": 1,
+      "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-07-21T14:56:45+08:00",
+  "updated_at": "2026-07-21T16:31:06+08:00",
   "overall_status": "partial",
   "last_update_mode": "all"
 }

@@ -1,7 +1,7 @@
 app:
   name: "MacroScope Public"
   title_cn: "全球宏观与市场监测看板"
-  version: "5.1.0"
+  version: "5.2.0"
   subtitle: "宏观流动性、全球指数、科技龙头、A股情绪与杠杆"
   disclaimer: "公开数据可能存在延迟、修订或临时中断，仅供研究与信息展示，不构成投资建议。"
 

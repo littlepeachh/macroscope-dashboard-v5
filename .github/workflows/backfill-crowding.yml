@@ -1,0 +1,75 @@
+name: Backfill A-share crowding history
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_date:
+        description: "开始日期 YYYYMMDD；建议先回填最近一年"
+        required: true
+        default: "20250101"
+      end_date:
+        description: "结束日期 YYYYMMDD；留空为今天"
+        required: false
+        default: ""
+      batch_size:
+        description: "每批股票数；失败时改为50"
+        required: true
+        default: "100"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: macroscope-pages
+  cancel-in-progress: false
+
+jobs:
+  backfill-build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Backfill crowding and breadth
+        shell: bash
+        run: |
+          END_ARG=""
+          if [ -n "${{ inputs.end_date }}" ]; then
+            END_ARG="--end ${{ inputs.end_date }}"
+          fi
+          python scripts/backfill_crowding.py \
+            --start "${{ inputs.start_date }}" \
+            $END_ARG \
+            --batch-size "${{ inputs.batch_size }}"
+      - name: Build static website
+        run: python scripts/build_site.py
+      - name: Commit historical cache
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/crowding.csv data/breadth.csv data/status.json public
+          if git diff --cached --quiet; then
+            echo "No backfill changes."
+          else
+            git commit -m "data: backfill A-share crowding and breadth [skip ci]"
+            git push
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

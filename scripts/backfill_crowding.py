@@ -45,35 +45,160 @@ def validate_date(value: str, name: str) -> str:
         raise ValueError(f"{name} 必须是 YYYYMMDD，例如 20250101") from exc
 
 
-def load_a_share_codes() -> list[str]:
+def _codes_from_frame(frame: pd.DataFrame, candidates: list[str]) -> list[str]:
+    if not isinstance(frame, pd.DataFrame) or frame.empty:
+        return []
+    code_col = pick_column(frame, candidates)
+    if code_col is None:
+        return []
+    codes = (
+        frame[code_col]
+        .astype(str)
+        .str.extract(r"(\d{6})", expand=False)
+        .dropna()
+        .str.zfill(6)
+    )
+    codes = codes[codes.str.startswith(A_SHARE_PREFIXES)]
+    return sorted(codes.drop_duplicates().tolist())
+
+
+def _call_with_retry(label: str, fn, attempts: int = 4) -> pd.DataFrame:
+    last_error: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            frame = fn()
+            if isinstance(frame, pd.DataFrame) and not frame.empty:
+                return frame
+            raise RuntimeError("返回空表")
+        except Exception as exc:
+            last_error = exc
+            if attempt < attempts:
+                wait_seconds = min(30, 2 ** attempt)
+                print(
+                    f"{label} 第 {attempt}/{attempts} 次失败，"
+                    f"{wait_seconds} 秒后重试：{exc!r}",
+                    flush=True,
+                )
+                time.sleep(wait_seconds)
+    raise RuntimeError(f"{label} 连续失败：{last_error!r}")
+
+
+def _universe_cache_path() -> Path:
+    return ROOT / "data" / "a_share_universe.csv"
+
+
+def _load_cached_universe() -> list[str]:
+    path = _universe_cache_path()
+    frame = read_csv_safe(path)
+    return _codes_from_frame(frame, ["code", "证券代码", "A股代码"])
+
+
+def _save_universe(codes: list[str], source: str) -> None:
+    path = _universe_cache_path()
+    rows = pd.DataFrame({
+        "code": sorted(set(codes)),
+    })
+    rows["exchange"] = np.where(
+        rows["code"].str.startswith("6"), "SSE", "SZSE"
+    )
+    rows["source"] = source
+    rows["updated_at"] = now_iso()
+    write_csv_atomic(rows, path)
+
+
+def load_a_share_codes() -> tuple[list[str], str]:
+    """获取沪深 A 股代码。
+
+    优先读取上交所、深交所官方股票列表；其次尝试 AKShare 的沪深京
+    汇总接口；最后使用仓库内上次成功保存的代码快照。这样即使东方财富
+    对 GitHub Runner 临时断开连接，历史回填仍能继续。
+    """
     import akshare as ak
 
+    minimum_expected = 4000
     errors: list[str] = []
-    for label, call in [
-        ("沪深京A股实时列表", getattr(ak, "stock_zh_a_spot_em", None)),
-        ("A股代码名称表", getattr(ak, "stock_info_a_code_name", None)),
-    ]:
-        if not callable(call):
-            continue
+    cached = _load_cached_universe()
+
+    official_specs = [
+        (
+            "上交所主板A股",
+            lambda: ak.stock_info_sh_name_code(symbol="主板A股"),
+            ["证券代码", "code"],
+        ),
+        (
+            "上交所科创板",
+            lambda: ak.stock_info_sh_name_code(symbol="科创板"),
+            ["证券代码", "code"],
+        ),
+        (
+            "深交所A股",
+            lambda: ak.stock_info_sz_name_code(symbol="A股列表"),
+            ["A股代码", "证券代码", "code"],
+        ),
+    ]
+
+    official_codes: list[str] = []
+    official_success = 0
+    for label, fn, candidates in official_specs:
         try:
-            frame = call()
-            if not isinstance(frame, pd.DataFrame) or frame.empty:
-                errors.append(f"{label}: 空表")
-                continue
-            code_col = pick_column(frame, ["代码", "code", "symbol", "股票代码"])
-            if code_col is None:
-                errors.append(f"{label}: 缺少代码字段")
-                continue
-            codes = (
-                frame[code_col].astype(str).str.extract(r"(\d{6})", expand=False)
-                .dropna().str.zfill(6)
-            )
-            codes = codes[codes.str.startswith(A_SHARE_PREFIXES)]
-            if not codes.empty:
-                return sorted(codes.drop_duplicates().tolist())
+            frame = _call_with_retry(label, fn)
+            codes = _codes_from_frame(frame, candidates)
+            if not codes:
+                raise RuntimeError("未识别出证券代码字段")
+            official_codes.extend(codes)
+            official_success += 1
+            print(f"{label}：{len(codes)} 只", flush=True)
         except Exception as exc:
             errors.append(f"{label}: {exc!r}")
-    raise RuntimeError("无法取得A股代码列表：" + " | ".join(errors))
+
+    official_codes = sorted(set(official_codes))
+    if official_success == len(official_specs) and len(official_codes) >= minimum_expected:
+        source = "上交所及深交所官方上市股票列表 / AKShare"
+        _save_universe(official_codes, source)
+        return official_codes, source
+
+    # 如果官方接口只成功一部分，用上次代码快照补齐；避免丢失整个市场。
+    official_plus_cache = sorted(set(official_codes).union(cached))
+    if len(official_plus_cache) >= minimum_expected:
+        source = "交易所官方列表（部分）+ 仓库内A股代码快照"
+        _save_universe(official_plus_cache, source)
+        return official_plus_cache, source
+
+    combined_specs = [
+        (
+            "沪深京A股实时列表",
+            getattr(ak, "stock_zh_a_spot_em", None),
+            ["代码", "code", "symbol", "股票代码"],
+        ),
+        (
+            "A股代码名称表",
+            getattr(ak, "stock_info_a_code_name", None),
+            ["code", "代码", "symbol", "股票代码"],
+        ),
+    ]
+    for label, fn, candidates in combined_specs:
+        if not callable(fn):
+            continue
+        try:
+            frame = _call_with_retry(label, fn)
+            codes = _codes_from_frame(frame, candidates)
+            if len(codes) < minimum_expected:
+                raise RuntimeError(
+                    f"仅返回 {len(codes)} 只，低于完整沪深A股列表的安全阈值"
+                )
+            source = f"{label} / AKShare"
+            _save_universe(codes, source)
+            return codes, source
+        except Exception as exc:
+            errors.append(f"{label}: {exc!r}")
+
+    if len(cached) >= minimum_expected:
+        return cached, "仓库内上次成功保存的A股代码快照"
+
+    raise RuntimeError(
+        "无法取得完整沪深A股代码列表；已尝试交易所官方列表、"
+        "AKShare汇总列表和本地快照。详细错误：" + " | ".join(errors)
+    )
 
 
 def normalize_history(frame: pd.DataFrame) -> pd.DataFrame:
@@ -127,7 +252,7 @@ def calculate_history(
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
     if not 0 < top_fraction <= 1:
         raise ValueError("top_fraction 必须在 (0, 1] 范围内")
-    codes = load_a_share_codes()
+    codes, universe_source = load_a_share_codes()
     amounts_by_date: dict[str, list[float]] = defaultdict(list)
     pct_by_date: dict[str, list[float]] = defaultdict(list)
     successful_symbols = 0
@@ -198,6 +323,7 @@ def calculate_history(
         raise RuntimeError("没有生成任何历史交易拥挤度记录")
     metadata = {
         "requested_symbols": len(codes),
+        "universe_source": universe_source,
         "successful_symbols": successful_symbols,
         "failed_batches": failed_batches,
         "start_date": start_date,

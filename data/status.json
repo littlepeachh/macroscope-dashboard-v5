@@ -67,8 +67,8 @@
     "market": {
       "status": "success",
       "rows": 32456,
-      "started_at": "2026-07-21T19:14:35+08:00",
-      "finished_at": "2026-07-21T19:14:45+08:00",
+      "started_at": "2026-07-21T21:07:26+08:00",
+      "finished_at": "2026-07-21T21:07:38+08:00",
       "latest_date": "20260721",
       "total_cached_rows": 32457,
       "symbols": {
@@ -214,8 +214,8 @@
     "valuation": {
       "status": "success",
       "rows": 23253,
-      "started_at": "2026-07-21T19:24:03+08:00",
-      "finished_at": "2026-07-21T19:24:34+08:00",
+      "started_at": "2026-07-21T21:07:38+08:00",
+      "finished_at": "2026-07-21T21:08:04+08:00",
       "latest_date": "20260721",
       "total_cached_rows": 23253,
       "indices": {
@@ -258,8 +258,8 @@
     "sentiment": {
       "status": "success",
       "rows": 2,
-      "started_at": "2026-07-21T19:24:34+08:00",
-      "finished_at": "2026-07-21T19:26:23+08:00",
+      "started_at": "2026-07-21T21:08:04+08:00",
+      "finished_at": "2026-07-21T21:09:40+08:00",
       "latest_date": "20260721",
       "crowding_cached_rows": 1,
       "breadth_cached_rows": 1,
@@ -275,8 +275,8 @@
     "deviation": {
       "status": "success",
       "rows": 1680,
-      "started_at": "2026-07-21T19:26:23+08:00",
-      "finished_at": "2026-07-21T19:26:23+08:00",
+      "started_at": "2026-07-21T21:09:40+08:00",
+      "finished_at": "2026-07-21T21:09:40+08:00",
       "latest_date": "20260721",
       "total_cached_rows": 1680,
       "method": "(指数收盘/10周或20周均线-1)×100%",
@@ -338,7 +338,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-07-21T19:13:51+08:00",
+  "updated_at": "2026-07-21T21:07:26+08:00",
   "overall_status": "success",
-  "last_update_mode": "all"
+  "last_update_mode": "close"
 }

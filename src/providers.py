@@ -278,14 +278,54 @@ class ChinaMarketProvider:
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
     def fetch_index(self, item: dict[str, Any], start_date: str, end_date: str) -> pd.DataFrame:
+        """Fetch Chinese index history with independent Sina/Tencent/Eastmoney/CSIndex fallbacks."""
         code = str(item["code"])
-        frames: list[tuple[str, Callable[[], pd.DataFrame]]] = []
-        if item.get("source_preference") == "csindex" or code.startswith("93"):
-            frames.append(("中证指数官网 / AKShare", lambda: self.ak.stock_zh_index_hist_csindex(symbol=code, start_date=start_date, end_date=end_date)))
-            frames.append(("东方财富 / AKShare", lambda: self.ak.index_zh_a_hist(symbol=code, period="daily", start_date=start_date, end_date=end_date)))
+        symbol = str(item["symbol"])
+        if symbol.endswith(".SZ") or code.startswith("399"):
+            vendor_symbol = f"sz{code}"
+        elif symbol.endswith(".CSI") or code.startswith("93"):
+            vendor_symbol = f"csi{code}"
         else:
-            frames.append(("东方财富 / AKShare", lambda: self.ak.index_zh_a_hist(symbol=code, period="daily", start_date=start_date, end_date=end_date)))
-            frames.append(("中证指数官网 / AKShare", lambda: self.ak.stock_zh_index_hist_csindex(symbol=code, start_date=start_date, end_date=end_date)))
+            vendor_symbol = f"sh{code}"
+
+        frames: list[tuple[str, Callable[[], pd.DataFrame]]] = []
+        preference = str(item.get("source_preference", "")).lower()
+
+        def add_standard_sources() -> None:
+            sina = getattr(self.ak, "stock_zh_index_daily", None)
+            if callable(sina) and not vendor_symbol.startswith("csi"):
+                frames.append(("新浪财经 / AKShare", lambda: sina(symbol=vendor_symbol)))
+            tx = getattr(self.ak, "stock_zh_index_daily_tx", None)
+            if callable(tx) and not vendor_symbol.startswith("csi"):
+                frames.append(("腾讯财经 / AKShare", lambda: tx(symbol=vendor_symbol)))
+            em_daily = getattr(self.ak, "stock_zh_index_daily_em", None)
+            if callable(em_daily):
+                frames.append((
+                    "东方财富指数日线 / AKShare",
+                    lambda: em_daily(symbol=vendor_symbol, start_date=start_date, end_date=end_date),
+                ))
+            index_hist = getattr(self.ak, "index_zh_a_hist", None)
+            if callable(index_hist):
+                frames.append((
+                    "东方财富指数历史 / AKShare",
+                    lambda: index_hist(symbol=code, period="daily", start_date=start_date, end_date=end_date),
+                ))
+
+        csindex = getattr(self.ak, "stock_zh_index_hist_csindex", None)
+        if preference == "csindex" or code.startswith("93"):
+            if callable(csindex):
+                frames.append((
+                    "中证指数官网 / AKShare",
+                    lambda: csindex(symbol=code, start_date=start_date, end_date=end_date),
+                ))
+            add_standard_sources()
+        else:
+            add_standard_sources()
+            if callable(csindex):
+                frames.append((
+                    "中证指数官网 / AKShare",
+                    lambda: csindex(symbol=code, start_date=start_date, end_date=end_date),
+                ))
 
         errors: list[str] = []
         for source, call in frames:
@@ -297,14 +337,14 @@ class ChinaMarketProvider:
                 date_col = pick_column(df, ["日期", "date", "Date"])
                 close_col = pick_column(df, ["收盘", "close", "Close"])
                 if date_col is None or close_col is None:
-                    errors.append(f"{source}: 缺少日期或收盘字段")
+                    errors.append(f"{source}: 缺少日期或收盘字段 {list(df.columns)}")
                     continue
                 pct_col = pick_column(df, ["涨跌幅", "pct_change", "pct_chg"])
                 volume_col = pick_column(df, ["成交量", "volume", "vol"])
                 amount_col = pick_column(df, ["成交额", "成交金额", "amount"])
                 out = pd.DataFrame({
                     "trade_date": df[date_col].map(date_key),
-                    "symbol": item["symbol"],
+                    "symbol": symbol,
                     "name": item.get("short_name", item["name"]),
                     "market": "CN_INDEX",
                     "close": numeric(df[close_col]),
@@ -313,7 +353,12 @@ class ChinaMarketProvider:
                     "amount": numeric(df[amount_col]) if amount_col else np.nan,
                     "source": source,
                 })
-                out = out.dropna(subset=["trade_date", "close"]).sort_values("trade_date")
+                out = out.dropna(subset=["trade_date", "close"])
+                out = out[(out["trade_date"] >= start_date) & (out["trade_date"] <= end_date)]
+                out = out.sort_values("trade_date").drop_duplicates("trade_date", keep="last")
+                if out.empty:
+                    errors.append(f"{source}: 日期过滤后为空")
+                    continue
                 if out["pct_change"].isna().all():
                     out["pct_change"] = out["close"].pct_change() * 100
                 return out.reset_index(drop=True)

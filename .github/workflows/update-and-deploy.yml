@@ -1,0 +1,110 @@
+name: Update data and deploy public dashboard
+
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - "data/**"
+      - "public/**"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "选择更新范围"
+        required: true
+        default: "all"
+        type: choice
+        options: [all, macro, global, close, fund, evening]
+  schedule:
+    - cron: "20 6 * * *"
+      timezone: "Asia/Shanghai"
+    - cron: "10 10 * * *"
+      timezone: "Asia/Shanghai"
+    - cron: "40 16 * * 1-5"
+      timezone: "Asia/Shanghai"
+    - cron: "40 18 * * *"
+      timezone: "Asia/Shanghai"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: macroscope-pages
+  cancel-in-progress: false
+
+jobs:
+  update-build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Select update mode
+        id: select
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            MODE="${{ inputs.mode }}"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            MODE="all"
+          elif [ "${{ github.event.schedule }}" = "20 6 * * *" ]; then
+            MODE="global"
+          elif [ "${{ github.event.schedule }}" = "10 10 * * *" ]; then
+            MODE="macro"
+          elif [ "${{ github.event.schedule }}" = "40 16 * * 1-5" ]; then
+            MODE="close"
+          elif [ "${{ github.event.schedule }}" = "40 18 * * *" ]; then
+            MODE="evening"
+          else
+            MODE="all"
+          fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "Selected mode: $MODE"
+
+      - name: Fetch and cache public data
+        continue-on-error: true
+        run: python scripts/update_data.py --mode "${{ steps.select.outputs.mode }}"
+
+      - name: Build static website
+        run: python scripts/build_site.py
+
+      - name: Persist refreshed cache
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data public
+          if git diff --cached --quiet; then
+            echo "No refreshed files to commit."
+          else
+            git commit -m "chore: refresh public dashboard data [skip ci]"
+            git push
+          fi
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

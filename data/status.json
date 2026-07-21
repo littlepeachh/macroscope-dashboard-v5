@@ -1,11 +1,11 @@
 {
-  "app_version": "5.1.0",
+  "app_version": "5.2.0",
   "datasets": {
     "macro": {
       "status": "success",
       "rows": 168,
-      "started_at": "2026-07-21T18:12:44+08:00",
-      "finished_at": "2026-07-21T18:13:07+08:00",
+      "started_at": "2026-07-21T19:13:51+08:00",
+      "finished_at": "2026-07-21T19:14:12+08:00",
       "latest_date": "202606",
       "total_cached_rows": 168,
       "source_details": {
@@ -45,8 +45,8 @@
     "liquidity": {
       "status": "success",
       "rows": 4941,
-      "started_at": "2026-07-21T18:13:07+08:00",
-      "finished_at": "2026-07-21T18:13:27+08:00",
+      "started_at": "2026-07-21T19:14:12+08:00",
+      "finished_at": "2026-07-21T19:14:35+08:00",
       "latest_date": "20260721",
       "total_cached_rows": 4941,
       "source_details": {
@@ -57,7 +57,7 @@
         },
         "dr": {
           "status": "failed",
-          "error": "DataFetchError('中国货币网页面未解析到DR001/DR007；将保留历史缓存，不用FDR替代')",
+          "error": "DataFetchError('中国货币网未解析到DR001/DR007；严格不以FDR替代。')",
           "note": "严格不使用FDR替代DR"
         }
       },
@@ -66,11 +66,11 @@
     },
     "market": {
       "status": "success",
-      "rows": 32455,
-      "started_at": "2026-07-21T18:13:27+08:00",
-      "finished_at": "2026-07-21T18:13:36+08:00",
+      "rows": 32456,
+      "started_at": "2026-07-21T19:14:35+08:00",
+      "finished_at": "2026-07-21T19:14:45+08:00",
       "latest_date": "20260721",
-      "total_cached_rows": 32456,
+      "total_cached_rows": 32457,
       "symbols": {
         "000001.SH": {
           "status": "success",
@@ -99,7 +99,7 @@
         },
         "931087.CSI": {
           "status": "success",
-          "rows": 1586,
+          "rows": 1587,
           "source": "中证指数官网 / AKShare"
         },
         "^IXIC": {
@@ -173,26 +173,55 @@
           "source": "Yahoo Finance / yfinance"
         }
       },
-      "cached_rows": 32456
+      "cached_rows": 32457
     },
     "global_macro": {
-      "status": "failed",
-      "rows": 0,
-      "started_at": "2026-07-21T18:13:36+08:00",
-      "finished_at": "2026-07-21T18:15:39+08:00",
-      "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=40)\"))"
+      "status": "success",
+      "rows": 2,
+      "started_at": "2026-07-21T19:14:45+08:00",
+      "finished_at": "2026-07-21T19:24:03+08:00",
+      "latest_date": "20260717",
+      "total_cached_rows": 2,
+      "source_details": {
+        "DGS2": {
+          "status": "success",
+          "rows": 1,
+          "latest_date": "20260717",
+          "source": "美联储H.15当前发布页",
+          "fallback_errors": [
+            "FRED CSV: ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=45)\"))",
+            "FRED TXT: ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=45)\"))"
+          ]
+        },
+        "DGS10": {
+          "status": "success",
+          "rows": 1,
+          "latest_date": "20260717",
+          "source": "美联储H.15当前发布页",
+          "fallback_errors": [
+            "FRED CSV: ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=45)\"))",
+            "FRED TXT: ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=45)\"))"
+          ]
+        }
+      },
+      "latest_by_series": {
+        "DGS2": "20260717",
+        "DGS10": "20260717"
+      },
+      "note": "DGS10独立抓取；DGS2失败不会阻止美国10年期国债收益率更新。",
+      "cached_rows": 2
     },
     "valuation": {
       "status": "success",
-      "rows": 23248,
-      "started_at": "2026-07-21T18:15:39+08:00",
-      "finished_at": "2026-07-21T18:16:07+08:00",
-      "latest_date": "20260720",
-      "total_cached_rows": 23248,
+      "rows": 23253,
+      "started_at": "2026-07-21T19:24:03+08:00",
+      "finished_at": "2026-07-21T19:24:34+08:00",
+      "latest_date": "20260721",
+      "total_cached_rows": 23253,
       "indices": {
         "000001.SH": {
           "status": "success",
-          "rows": 5476,
+          "rows": 5477,
           "source": "中证指数官网 / AKShare"
         },
         "399001.SZ": {
@@ -205,32 +234,32 @@
         },
         "000688.SH": {
           "status": "success",
-          "rows": 1587,
+          "rows": 1588,
           "source": "中证指数官网 / AKShare"
         },
         "000016.SH": {
           "status": "success",
-          "rows": 5476,
+          "rows": 5477,
           "source": "中证指数官网 / AKShare"
         },
         "000300.SH": {
           "status": "success",
-          "rows": 5475,
+          "rows": 5476,
           "source": "中证指数官网 / AKShare"
         },
         "000905.SH": {
           "status": "success",
-          "rows": 5234,
+          "rows": 5235,
           "source": "中证指数官网 / AKShare"
         }
       },
-      "cached_rows": 23248
+      "cached_rows": 23253
     },
     "sentiment": {
       "status": "success",
       "rows": 2,
-      "started_at": "2026-07-21T18:16:07+08:00",
-      "finished_at": "2026-07-21T18:17:40+08:00",
+      "started_at": "2026-07-21T19:24:34+08:00",
+      "finished_at": "2026-07-21T19:26:23+08:00",
       "latest_date": "20260721",
       "crowding_cached_rows": 1,
       "breadth_cached_rows": 1,
@@ -246,8 +275,8 @@
     "deviation": {
       "status": "success",
       "rows": 1680,
-      "started_at": "2026-07-21T18:17:40+08:00",
-      "finished_at": "2026-07-21T18:17:41+08:00",
+      "started_at": "2026-07-21T19:26:23+08:00",
+      "finished_at": "2026-07-21T19:26:23+08:00",
       "latest_date": "20260721",
       "total_cached_rows": 1680,
       "method": "(指数收盘/10周或20周均线-1)×100%",
@@ -283,8 +312,8 @@
     "fund_subscription": {
       "status": "success",
       "rows": 300,
-      "started_at": "2026-07-21T18:17:41+08:00",
-      "finished_at": "2026-07-21T18:17:46+08:00",
+      "started_at": "2026-07-21T19:26:23+08:00",
+      "finished_at": "2026-07-21T19:26:30+08:00",
       "latest_date": "20260715",
       "total_cached_rows": 300,
       "note": "公开字段为募集份额（亿份）；按基金常见初始面值1元/份近似展示募集规模（亿元），并非基金存续期每日净申购额。",
@@ -309,7 +338,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-07-21T18:12:44+08:00",
-  "overall_status": "partial",
+  "updated_at": "2026-07-21T19:13:51+08:00",
+  "overall_status": "success",
   "last_update_mode": "all"
 }

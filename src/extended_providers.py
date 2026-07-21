@@ -117,50 +117,171 @@ class GlobalMarketProvider:
 
 
 class FredTreasuryProvider:
-    """Federal Reserve H.15 Treasury yields exposed through FRED CSV."""
+    """Official U.S. Treasury yields with independent per-series fallbacks.
 
-    CSV_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS2,DGS10"
+    Primary source: FRED CSV (Federal Reserve H.15 series).
+    Fallbacks: FRED plain-text series file, then the Federal Reserve H.15
+    current-release HTML table for the latest observation. DGS10 is fetched
+    independently from DGS2 so one missing series can never suppress the other.
+    """
+
+    SERIES = {
+        "DGS2": "美国2年期国债收益率",
+        "DGS10": "美国10年期国债收益率",
+    }
+    FRED_CSV = "https://fred.stlouisfed.org/graph/fredgraph.csv?id={series}&cosd={start}"
+    FRED_TXT = "https://fred.stlouisfed.org/data/{series}.txt"
+    H15_URL = "https://www.federalreserve.gov/releases/h15/"
+
+    @staticmethod
+    def _headers() -> dict[str, str]:
+        return {
+            "User-Agent": "Mozilla/5.0 (compatible; MacroScopePublic/5.2; research dashboard)",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,text/csv;q=0.8,*/*;q=0.7",
+            "Accept-Language": "en-US,en;q=0.9",
+        }
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10), reraise=True)
-    def fetch(self, start_date: str) -> pd.DataFrame:
-        response = requests.get(
-            self.CSV_URL,
-            timeout=40,
-            headers={"User-Agent": "Mozilla/5.0 (compatible; MacroScopePublic/5.0; research dashboard)"},
-        )
+    def _fred_csv(self, series: str, start_date: str) -> pd.DataFrame:
+        url = self.FRED_CSV.format(series=series, start=pd.to_datetime(start_date).strftime("%Y-%m-%d"))
+        response = requests.get(url, timeout=45, headers=self._headers())
         response.raise_for_status()
         raw = pd.read_csv(io.StringIO(response.text))
         date_col = pick_column(raw, ["DATE", "observation_date", "date"])
-        if date_col is None:
-            raise DataFetchError(f"FRED CSV 缺少日期字段: {list(raw.columns)}")
+        if date_col is None or series not in raw.columns:
+            raise DataFetchError(f"FRED CSV缺少{series}: {list(raw.columns)}")
+        out = pd.DataFrame({
+            "trade_date": raw[date_col].map(date_key),
+            "value_pct": numeric(raw[series]),
+        }).dropna(subset=["trade_date", "value_pct"])
+        out = out[out["trade_date"] >= start_date]
+        if out.empty:
+            raise DataFetchError(f"FRED CSV中{series}为空")
+        return out
+
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10), reraise=True)
+    def _fred_txt(self, series: str, start_date: str) -> pd.DataFrame:
+        response = requests.get(self.FRED_TXT.format(series=series), timeout=45, headers=self._headers())
+        response.raise_for_status()
+        lines = response.text.splitlines()
+        header_idx = next((i for i, line in enumerate(lines) if re.match(r"^\s*DATE\s+VALUE\s*$", line)), None)
+        if header_idx is None:
+            raise DataFetchError(f"FRED TXT未找到{series}数据头")
+        raw = pd.read_csv(io.StringIO("\n".join(lines[header_idx:])), sep=r"\s+", engine="python")
+        if "DATE" not in raw.columns or "VALUE" not in raw.columns:
+            raise DataFetchError(f"FRED TXT缺少{series}字段")
+        out = pd.DataFrame({
+            "trade_date": raw["DATE"].map(date_key),
+            "value_pct": numeric(raw["VALUE"]),
+        }).dropna(subset=["trade_date", "value_pct"])
+        out = out[out["trade_date"] >= start_date]
+        if out.empty:
+            raise DataFetchError(f"FRED TXT中{series}为空")
+        return out
+
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10), reraise=True)
+    def _h15_latest(self, series: str) -> pd.DataFrame:
+        response = requests.get(self.H15_URL, timeout=45, headers=self._headers())
+        response.raise_for_status()
+        tables = pd.read_html(io.StringIO(response.text))
+        target = "2-year" if series == "DGS2" else "10-year"
+        for table in tables:
+            flat = table.copy()
+            flat.columns = [" ".join(str(x) for x in col if str(x) != "nan") if isinstance(col, tuple) else str(col) for col in flat.columns]
+            for _, row in flat.iterrows():
+                first = str(row.iloc[0]).strip().lower()
+                if target not in first:
+                    continue
+                values: list[tuple[str, float]] = []
+                for col, cell in row.iloc[1:].items():
+                    val = pd.to_numeric(pd.Series([cell]), errors="coerce").iloc[0]
+                    if pd.isna(val):
+                        continue
+                    # Try a date from the column header; if not available, use release date.
+                    parsed = pd.to_datetime(str(col), errors="coerce")
+                    date = parsed.strftime("%Y%m%d") if pd.notna(parsed) else None
+                    values.append((date or "", float(val)))
+                if not values:
+                    continue
+                trade_date, value = values[-1]
+                if not trade_date:
+                    soup = BeautifulSoup(response.text, "html.parser")
+                    page_text = " ".join(soup.stripped_strings)
+                    match = re.search(r"Release date:\s*([A-Za-z]+\s+\d{1,2},\s+\d{4})", page_text)
+                    parsed = pd.to_datetime(match.group(1), errors="coerce") if match else pd.NaT
+                    trade_date = (parsed - pd.tseries.offsets.BDay(1)).strftime("%Y%m%d") if pd.notna(parsed) else datetime.now().strftime("%Y%m%d")
+                return pd.DataFrame([{"trade_date": trade_date, "value_pct": value}])
+        raise DataFetchError(f"H.15当前发布页未解析到{series}")
+
+    def fetch_with_details(self, start_date: str) -> tuple[pd.DataFrame, dict[str, Any]]:
         frames: list[pd.DataFrame] = []
-        names = {"DGS2": "美国2年期国债收益率", "DGS10": "美国10年期国债收益率"}
-        for series, name in names.items():
-            if series not in raw.columns:
+        details: dict[str, Any] = {}
+        for series, name in self.SERIES.items():
+            errors: list[str] = []
+            frame = pd.DataFrame()
+            source = ""
+            for label, fn in [
+                ("FRED CSV", self._fred_csv),
+                ("FRED TXT", self._fred_txt),
+            ]:
+                try:
+                    frame = fn(series, start_date)
+                    source = f"美联储H.15 / {label}"
+                    break
+                except Exception as exc:
+                    errors.append(f"{label}: {exc!r}")
+            if frame.empty:
+                try:
+                    frame = self._h15_latest(series)
+                    source = "美联储H.15当前发布页"
+                except Exception as exc:
+                    errors.append(f"H15 HTML: {exc!r}")
+            if frame.empty:
+                details[series] = {"status": "failed", "errors": errors}
                 continue
-            frame = pd.DataFrame({
-                "trade_date": raw[date_col].map(date_key),
-                "series": series,
-                "name": name,
-                "value_pct": numeric(raw[series]),
-                "unit": "%",
-                "source": "美联储H.15 / FRED",
-            })
-            frame = frame.dropna(subset=["trade_date", "value_pct"])
-            frame = frame[frame["trade_date"] >= start_date]
-            frames.append(frame)
+            frame = frame.copy()
+            frame["series"] = series
+            frame["name"] = name
+            frame["unit"] = "%"
+            frame["source"] = source
+            frames.append(frame[["trade_date", "series", "name", "value_pct", "unit", "source"]])
+            details[series] = {
+                "status": "success",
+                "rows": len(frame),
+                "latest_date": str(frame["trade_date"].max()),
+                "source": source,
+                "fallback_errors": errors,
+            }
         if not frames:
-            raise DataFetchError("FRED 未返回DGS2/DGS10")
-        return pd.concat(frames, ignore_index=True).sort_values(["series", "trade_date"])
+            raise DataFetchError(f"DGS2与DGS10均抓取失败: {details}")
+        out = pd.concat(frames, ignore_index=True).drop_duplicates(["trade_date", "series"], keep="last")
+        return out.sort_values(["series", "trade_date"]), details
+
+    def fetch(self, start_date: str) -> pd.DataFrame:
+        return self.fetch_with_details(start_date)[0]
 
 
 class ChinaLiquidityProvider:
     """Official/official-adapter money-market rates. DR is never replaced with FDR."""
 
-    CHINAMONEY_URL = "https://www.chinamoney.com.cn/chinese"
+    DR_URLS = [
+        "https://www.chinamoney.com.cn/chinese/mkdatapm/?tab=2",
+        "https://www.chinamoney.com.cn/english/mdtqapprp/",
+        "https://www.chinamoney.com.cn/chinese/mkdatapm/",
+    ]
 
     def __init__(self) -> None:
         self.ak = _import_akshare()
+
+    @staticmethod
+    def _headers() -> dict[str, str]:
+        return {
+            "User-Agent": "Mozilla/5.0 (compatible; MacroScopePublic/5.2; research dashboard)",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.7",
+            "Referer": "https://www.chinamoney.com.cn/",
+            "Cache-Control": "no-cache",
+        }
 
     def fetch_shibor_overnight(self) -> pd.DataFrame:
         frame = self.ak.rate_interbank(
@@ -183,39 +304,94 @@ class ChinaLiquidityProvider:
 
     @staticmethod
     def _extract_rate(text: str, code: str) -> float | None:
+        # Prefer a decimal after the exact code; this prevents capturing the 007 in DR007.
+        cleaned = re.sub(r"\s+", " ", text)
         patterns = [
-            rf"\b{re.escape(code)}\b\s*[:：]?\s*([0-9]+(?:\.[0-9]+)?)",
-            rf"\b{re.escape(code)}\b.{{0,80}}?([0-9]+(?:\.[0-9]+)?)",
+            rf"\b{re.escape(code)}\b[^0-9]{{0,120}}?([0-9]{{1,2}}\.[0-9]{{2,6}})",
+            rf"\b{re.escape(code)}\b[^0-9]{{0,120}}?([0-9]{{1,2}}(?:\.[0-9]+)?)\s*%",
         ]
         for pattern in patterns:
-            match = re.search(pattern, text, flags=re.I | re.S)
+            match = re.search(pattern, cleaned, flags=re.I | re.S)
             if match:
                 value = float(match.group(1))
                 if 0 <= value <= 30:
                     return value
         return None
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
-    def fetch_dr_current(self) -> pd.DataFrame:
-        response = requests.get(
-            self.CHINAMONEY_URL,
-            timeout=35,
-            headers={"User-Agent": "Mozilla/5.0 (compatible; MacroScopePublic/5.0; research dashboard)"},
-        )
+    @staticmethod
+    def _table_rate(table: pd.DataFrame, code: str) -> float | None:
+        frame = table.copy()
+        frame.columns = [" ".join(str(x) for x in col if str(x) != "nan") if isinstance(col, tuple) else str(col) for col in frame.columns]
+        for _, row in frame.iterrows():
+            row_text = " ".join(str(v) for v in row.tolist())
+            if not re.search(rf"\b{re.escape(code)}\b", row_text, flags=re.I):
+                continue
+            preferred = [c for c in frame.columns if any(k in str(c).lower() for k in ["加权利率", "weighted rate", "weighted avg", "weighted average"])]
+            for col in preferred:
+                value = pd.to_numeric(pd.Series([row[col]]), errors="coerce").iloc[0]
+                if pd.notna(value) and 0 <= float(value) <= 30:
+                    return float(value)
+            # Conservative fallback: use decimal-like values only and ignore codes/terms/counts.
+            candidates = re.findall(r"(?<!\d)([0-9]{1,2}\.[0-9]{2,6})(?!\d)", row_text)
+            for raw in candidates:
+                value = float(raw)
+                if 0 <= value <= 30:
+                    return value
+        return None
+
+    @retry(stop=stop_after_attempt(4), wait=wait_exponential(multiplier=1, min=2, max=16), reraise=True)
+    def _fetch_dr_page(self, url: str) -> tuple[float | None, float | None, str]:
+        response = requests.get(url, timeout=45, headers=self._headers())
         response.raise_for_status()
+        dr001 = dr007 = None
+        try:
+            for table in pd.read_html(io.StringIO(response.text)):
+                dr001 = dr001 if dr001 is not None else self._table_rate(table, "DR001")
+                dr007 = dr007 if dr007 is not None else self._table_rate(table, "DR007")
+                if dr001 is not None and dr007 is not None:
+                    break
+        except Exception:
+            pass
         soup = BeautifulSoup(response.text, "html.parser")
         text = " ".join(soup.stripped_strings)
-        dr001 = self._extract_rate(text, "DR001")
-        dr007 = self._extract_rate(text, "DR007")
+        dr001 = dr001 if dr001 is not None else self._extract_rate(text, "DR001")
+        dr007 = dr007 if dr007 is not None else self._extract_rate(text, "DR007")
+        return dr001, dr007, url
+
+    def fetch_dr_current(self) -> tuple[pd.DataFrame, dict[str, Any]]:
+        dr001 = dr007 = None
+        errors: list[str] = []
+        used: list[str] = []
+        for url in self.DR_URLS:
+            try:
+                x1, x7, source = self._fetch_dr_page(url)
+                if x1 is not None:
+                    dr001 = x1
+                if x7 is not None:
+                    dr007 = x7
+                used.append(source)
+                if dr001 is not None and dr007 is not None:
+                    break
+            except Exception as exc:
+                errors.append(f"{url}: {exc!r}")
         if dr001 is None and dr007 is None:
-            raise DataFetchError("中国货币网页面未解析到DR001/DR007；将保留历史缓存，不用FDR替代")
+            raise DataFetchError("中国货币网未解析到DR001/DR007；严格不以FDR替代。" + " | ".join(errors))
         trade_date = datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y%m%d")
-        return pd.DataFrame([{
+        frame = pd.DataFrame([{
             "trade_date": trade_date,
             "dr001_pct": dr001,
             "dr007_pct": dr007,
             "source": "中国货币网 / 全国银行间同业拆借中心",
         }])
+        details = {
+            "status": "success" if dr007 is not None else "partial",
+            "dr001_pct": dr001,
+            "dr007_pct": dr007,
+            "urls_used": used,
+            "errors": errors,
+            "note": "DR007为存款类机构7天质押式回购加权利率；未使用FDR007替代。",
+        }
+        return frame, details
 
     def fetch(self) -> tuple[pd.DataFrame, dict[str, Any]]:
         details: dict[str, Any] = {}
@@ -227,8 +403,8 @@ class ChinaLiquidityProvider:
         except Exception as exc:
             details["shibor_on"] = {"status": "failed", "error": repr(exc)}
         try:
-            dr = self.fetch_dr_current()
-            details["dr"] = {"status": "success", "rows": len(dr), "source": "中国货币网"}
+            dr, dr_details = self.fetch_dr_current()
+            details["dr"] = dr_details
         except Exception as exc:
             details["dr"] = {"status": "failed", "error": repr(exc), "note": "严格不使用FDR替代DR"}
         if shibor.empty and dr.empty:
@@ -243,7 +419,9 @@ class ChinaLiquidityProvider:
             out["source"] = "中国货币网 / AKShare"
         else:
             out = shibor.merge(dr, on="trade_date", how="outer", suffixes=("_shibor", "_dr"))
-            out["source"] = out.get("source_dr").fillna(out.get("source_shibor"))
+            source_dr = out["source_dr"] if "source_dr" in out.columns else pd.Series(index=out.index, dtype=object)
+            source_shibor = out["source_shibor"] if "source_shibor" in out.columns else pd.Series(index=out.index, dtype=object)
+            out["source"] = source_dr.fillna(source_shibor)
             out = out.drop(columns=[x for x in ["source_dr", "source_shibor"] if x in out.columns])
         return out.sort_values("trade_date"), details
 

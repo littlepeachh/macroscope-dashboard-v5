@@ -59,7 +59,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/crowding.csv data/breadth.csv data/status.json public
+          git add data public
           if git diff --cached --quiet; then
             echo "No backfill changes."
           else

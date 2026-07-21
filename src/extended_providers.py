@@ -254,21 +254,107 @@ class ChinaSentimentProvider:
     def __init__(self) -> None:
         self.ak = _import_akshare()
 
-    def _spot(self) -> tuple[pd.DataFrame, str]:
-        errors: list[str] = []
-        for source, fn in [
-            ("沪深京A股实时行情", getattr(self.ak, "stock_zh_a_spot_em", None)),
-        ]:
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=12), reraise=True)
+    def _call_frame(self, fn: Any, **kwargs: Any) -> pd.DataFrame:
+        frame = fn(**kwargs)
+        if not isinstance(frame, pd.DataFrame) or frame.empty:
+            raise DataFetchError("数据源返回空表")
+        return frame
+
+    def _split_spot_em(self) -> pd.DataFrame:
+        frames: list[pd.DataFrame] = []
+        for fn_name in ["stock_sh_a_spot_em", "stock_sz_a_spot_em"]:
+            fn = getattr(self.ak, fn_name, None)
             if not callable(fn):
                 continue
             try:
-                frame = fn()
-                if isinstance(frame, pd.DataFrame) and not frame.empty:
-                    return _clean_a_spot(frame), source + " / AKShare"
-                errors.append(f"{source}: 空表")
+                frame = self._call_frame(fn)
+                frames.append(frame)
+            except Exception:
+                continue
+        return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+
+    def _spot(self) -> tuple[pd.DataFrame, str]:
+        """Return one all-A-share snapshot with Eastmoney, Sina and split-market fallbacks."""
+        errors: list[str] = []
+        candidates: list[tuple[str, Any]] = [
+            ("东方财富沪深京A股实时行情", getattr(self.ak, "stock_zh_a_spot_em", None)),
+            ("新浪沪深京A股实时行情", getattr(self.ak, "stock_zh_a_spot", None)),
+            ("东方财富沪深A股分市场行情", self._split_spot_em),
+        ]
+        for source, fn in candidates:
+            if not callable(fn):
+                errors.append(f"{source}: 当前AKShare版本无此接口")
+                continue
+            try:
+                frame = self._call_frame(fn)
+                clean = _clean_a_spot(frame)
+                valid = clean[clean["amount"].notna() & (clean["amount"] > 0)]
+                if len(valid) < 1000:
+                    errors.append(f"{source}: 有效A股仅{len(valid)}只")
+                    continue
+                return clean, source + " / AKShare"
             except Exception as exc:
                 errors.append(f"{source}: {exc!r}")
         raise DataFetchError("A股实时行情失败: " + " | ".join(errors))
+
+    @staticmethod
+    def _to_yuan(value: float | int | None, *, default_unit: str) -> float | None:
+        if value is None or not np.isfinite(float(value)):
+            return None
+        number = float(value)
+        if default_unit == "100m":
+            return number * 1e8
+        return number
+
+    def _official_market_cap(self, trade_date: str) -> tuple[float | None, str]:
+        """Get沪深股票总市值 from exchange market-summary tables as fallback."""
+        errors: list[str] = []
+        sse_cap_yuan: float | None = None
+        szse_cap_yuan: float | None = None
+
+        sse_fn = getattr(self.ak, "stock_sse_summary", None)
+        if callable(sse_fn):
+            try:
+                sse = self._call_frame(sse_fn)
+                item_col = pick_column(sse, ["项目", "item"])
+                stock_col = pick_column(sse, ["股票", "stock"])
+                if item_col and stock_col:
+                    row = sse[sse[item_col].astype(str).str.replace(r"\s+", "", regex=True) == "总市值"]
+                    if not row.empty:
+                        raw = numeric(row[stock_col]).dropna()
+                        if not raw.empty:
+                            # 上交所股票数据总貌的总市值字段为亿元。
+                            sse_cap_yuan = float(raw.iloc[-1]) * 1e8
+            except Exception as exc:
+                errors.append(f"上交所市场总貌: {exc!r}")
+
+        sz_fn = getattr(self.ak, "stock_szse_summary", None)
+        if callable(sz_fn):
+            candidate_dates = pd.bdate_range(
+                end=pd.to_datetime(trade_date), periods=8
+            ).strftime("%Y%m%d").tolist()[::-1]
+            for candidate in candidate_dates:
+                try:
+                    sz = self._call_frame(sz_fn, date=candidate)
+                    category_col = pick_column(sz, ["证券类别", "类别"])
+                    cap_col = pick_column(sz, ["总市值", "market_cap"])
+                    if category_col and cap_col:
+                        categories = sz[category_col].astype(str)
+                        a_rows = sz[categories.str.contains("A股", na=False)]
+                        target = a_rows if not a_rows.empty else sz[categories == "股票"]
+                        values = numeric(target[cap_col]).dropna()
+                        if not values.empty:
+                            # 深交所市场总貌总市值字段为元。
+                            szse_cap_yuan = float(values.sum())
+                            break
+                except Exception as exc:
+                    errors.append(f"深交所市场总貌{candidate}: {exc!r}")
+
+        parts = [x for x in [sse_cap_yuan, szse_cap_yuan] if x is not None and np.isfinite(x)]
+        if not parts:
+            return None, "；".join(errors[-4:])
+        return float(sum(parts)), "上交所、深交所市场总貌 / AKShare"
 
     def fetch_snapshot(self, top_fraction: float) -> tuple[dict[str, Any], dict[str, Any]]:
         if not 0 < top_fraction <= 1:
@@ -284,8 +370,15 @@ class ChinaSentimentProvider:
         up_count = int((valid_pct["pct_change"] > 0).sum())
         down_count = int((valid_pct["pct_change"] < 0).sum())
         flat_count = int((valid_pct["pct_change"] == 0).sum())
-        total_market_cap = float(clean["market_cap"].dropna().sum()) if clean["market_cap"].notna().any() else np.nan
         trade_date = _latest_trade_date(self.ak)
+
+        if clean["market_cap"].notna().any():
+            total_market_cap = float(clean["market_cap"].dropna().sum())
+            cap_source = source
+        else:
+            total_market_cap, cap_source = self._official_market_cap(trade_date)
+            total_market_cap = float(total_market_cap) if total_market_cap is not None else np.nan
+
         crowding = {
             "trade_date": trade_date,
             "top_fraction": top_fraction,
@@ -306,6 +399,7 @@ class ChinaSentimentProvider:
             "total_market_cap_trillion": total_market_cap / 1e12 if np.isfinite(total_market_cap) else np.nan,
             "broad_turnover_pct": total_amount / total_market_cap * 100 if np.isfinite(total_market_cap) and total_market_cap > 0 else np.nan,
             "source": source,
+            "market_cap_source": cap_source,
         }
         return crowding, breadth
 
@@ -319,7 +413,6 @@ class ChinaSentimentProvider:
         values = numeric(frame[col]).dropna()
         if values.empty:
             return None
-        # Some endpoints return one market-total row; others return security-level rows.
         text = frame.astype(str).agg(" ".join, axis=1)
         total_mask = text.str.contains("合计|总计", regex=True, na=False)
         if total_mask.any():
@@ -330,55 +423,91 @@ class ChinaSentimentProvider:
             return float(values.iloc[0])
         return float(values.sum())
 
+    @staticmethod
+    def _latest_margin_from_history(frame: pd.DataFrame) -> tuple[str, float] | None:
+        if frame is None or frame.empty:
+            return None
+        date_col = pick_column(frame, ["日期", "信用交易日期", "trade_date"])
+        value_col = pick_column(frame, ["融资融券余额", "融资融券余额(元)"], contains=["融资", "融券", "余额"])
+        if date_col is None or value_col is None:
+            return None
+        clean = pd.DataFrame({
+            "trade_date": frame[date_col].map(date_key),
+            "value": numeric(frame[value_col]),
+        }).dropna(subset=["trade_date", "value"]).sort_values("trade_date")
+        if clean.empty:
+            return None
+        row = clean.iloc[-1]
+        return str(row["trade_date"]), float(row["value"])
+
     def fetch_margin(self, total_market_cap_trillion: float | None) -> dict[str, Any]:
-        trade_date = _latest_trade_date(self.ak)
-        start = (datetime.strptime(trade_date, "%Y%m%d") - timedelta(days=20)).strftime("%Y%m%d")
+        """Fetch沪深两融余额 with correct exchange-specific units and historical fallbacks."""
+        target_date = _latest_trade_date(self.ak)
+        start = (datetime.strptime(target_date, "%Y%m%d") - timedelta(days=25)).strftime("%Y%m%d")
         errors: list[str] = []
-        sse_value: float | None = None
-        szse_value: float | None = None
-        sse_date = trade_date
+        parts_yuan: list[tuple[str, float, str]] = []
+
+        # SSE official endpoint: RMB yuan.
         try:
-            sse = self.ak.stock_margin_sse(start_date=start, end_date=trade_date)
+            sse = self.ak.stock_margin_sse(start_date=start, end_date=target_date)
             date_col = pick_column(sse, ["信用交易日期", "日期", "trade_date"])
             if date_col:
-                sse = sse.assign(_date=sse[date_col].map(date_key)).sort_values("_date")
-                if not sse.empty:
-                    sse_date = str(sse["_date"].dropna().max())
-                    sse = sse[sse["_date"] == sse_date]
-            sse_value = self._extract_margin_total(sse)
+                sse = sse.assign(_date=sse[date_col].map(date_key)).dropna(subset=["_date"]).sort_values("_date")
+                latest_date = str(sse["_date"].max())
+                sse = sse[sse["_date"] == latest_date]
+            else:
+                latest_date = target_date
+            value = self._extract_margin_total(sse)
+            if value is not None:
+                parts_yuan.append((latest_date, float(value), "上交所融资融券汇总"))
         except Exception as exc:
-            errors.append(f"上交所: {exc!r}")
-        candidate_dates = pd.bdate_range(
-            end=pd.to_datetime(trade_date), periods=8
-        ).strftime("%Y%m%d").tolist()[::-1]
+            errors.append(f"上交所官方: {exc!r}")
+
+        # SZSE official endpoint: 100 million RMB.
+        candidate_dates = pd.bdate_range(end=pd.to_datetime(target_date), periods=10).strftime("%Y%m%d").tolist()[::-1]
         for candidate in candidate_dates:
             try:
                 szse = self.ak.stock_margin_szse(date=candidate)
-                szse_value = self._extract_margin_total(szse)
-                if szse_value is not None:
-                    trade_date = min(sse_date, candidate) if sse_value is not None else candidate
+                value = self._extract_margin_total(szse)
+                if value is not None:
+                    parts_yuan.append((candidate, float(value) * 1e8, "深交所融资融券汇总"))
                     break
             except Exception as exc:
-                errors.append(f"深交所{candidate}: {exc!r}")
-        parts = [x for x in [sse_value, szse_value] if x is not None and np.isfinite(x)]
-        if not parts:
-            raise DataFetchError("沪深两融余额失败: " + " | ".join(errors[-5:]))
-        total = float(sum(parts))
-        # Exchange endpoints normally report RMB yuan. Guard for tables reported in 100m RMB.
-        if total < 1e8:
-            total_yuan = total * 1e8
-            unit_note = "接口数值按亿元转换"
-        else:
-            total_yuan = total
-            unit_note = "接口数值按元使用"
+                errors.append(f"深交所官方{candidate}: {exc!r}")
+
+        # Historical public adapters are used only when an exchange part is missing.
+        have_sse = any("上交所" in x[2] for x in parts_yuan)
+        have_szse = any("深交所" in x[2] for x in parts_yuan)
+        if not have_sse:
+            try:
+                result = self._latest_margin_from_history(self.ak.macro_china_market_margin_sh())
+                if result:
+                    date_, value = result
+                    parts_yuan.append((date_, value, "上海两融历史公开表"))
+            except Exception as exc:
+                errors.append(f"上海两融备用: {exc!r}")
+        if not have_szse:
+            try:
+                result = self._latest_margin_from_history(self.ak.macro_china_market_margin_sz())
+                if result:
+                    date_, value = result
+                    parts_yuan.append((date_, value, "深圳两融历史公开表"))
+            except Exception as exc:
+                errors.append(f"深圳两融备用: {exc!r}")
+
+        if not parts_yuan:
+            raise DataFetchError("沪深两融余额失败: " + " | ".join(errors[-8:]))
+
+        total_yuan = float(sum(x[1] for x in parts_yuan))
+        trade_date = min(x[0] for x in parts_yuan)
         cap = float(total_market_cap_trillion) if total_market_cap_trillion is not None else np.nan
         return {
             "trade_date": trade_date,
             "margin_balance_trillion": total_yuan / 1e12,
             "total_market_cap_trillion": cap,
             "margin_to_market_cap_pct": (total_yuan / 1e12) / cap * 100 if np.isfinite(cap) and cap > 0 else np.nan,
-            "source": "上交所、深交所融资融券数据 / AKShare",
-            "note": unit_note,
+            "source": " + ".join(x[2] for x in parts_yuan),
+            "note": "上交所按元；深交所汇总接口按亿元转换；备用历史表按元。",
         }
 
 

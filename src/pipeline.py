@@ -212,18 +212,27 @@ def update_valuation(settings: dict[str, Any]) -> tuple[int, dict[str, Any]]:
 
 
 def update_sentiment(settings: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    """Update A-share snapshot.
+
+    During trading hours the values are explicitly marked as an intraday snapshot;
+    after 15:20 they are treated as the closing snapshot. Weekends and pre-open runs
+    keep the last successful cache instead of replacing it with blanks.
+    """
     now = datetime.now(ZoneInfo(settings.get("timezone", "Asia/Shanghai")))
-    if now.weekday() >= 5 or (now.hour, now.minute) < (15, 20):
+    if now.weekday() >= 5 or (now.hour, now.minute) < (9, 35):
         old = read_csv_safe(CROWDING_PATH)
         return 0, {
             "latest_date": _latest_value(old, "trade_date"),
             "total_cached_rows": len(old),
             "skipped": True,
-            "note": "A股收盘情绪指标仅在北京时间交易日15:20后追加。",
+            "note": "非A股交易时段，继续展示上一次成功快照。",
         }
 
     provider = ChinaSentimentProvider()
     crowding_row, breadth_row = provider.fetch_snapshot(float(settings["crowding"]["top_fraction"]))
+    snapshot_kind = "收盘后快照" if (now.hour, now.minute) >= (15, 20) else "盘中快照"
+    crowding_row["snapshot_kind"] = snapshot_kind
+    breadth_row["snapshot_kind"] = snapshot_kind
 
     crowding_old = read_csv_safe(CROWDING_PATH)
     crowding_merged = _merge_history(crowding_old, pd.DataFrame([crowding_row]), ["trade_date"])
@@ -242,6 +251,7 @@ def update_sentiment(settings: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         leverage_meta = {
             "status": "success", "rows": 1,
             "latest_date": leverage_row["trade_date"],
+            "source": leverage_row.get("source"),
         }
     except Exception as exc:
         leverage_meta = {"status": "failed", "error": repr(exc)}
@@ -252,6 +262,7 @@ def update_sentiment(settings: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         "breadth_cached_rows": len(breadth_merged),
         "leverage": leverage_meta,
         "source": crowding_row.get("source"),
+        "snapshot_kind": snapshot_kind,
     }
 
 
@@ -261,27 +272,37 @@ def update_deviation(settings: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         raise RuntimeError("没有市场行情，无法计算指数偏离度")
     names = {x["symbol"]: x["name"] for x in settings.get("deviation_indices", [])}
     rows: list[pd.DataFrame] = []
+    per_index: dict[str, Any] = {}
     for symbol, name in names.items():
         frame = market[market["symbol"] == symbol][["trade_date", "close"]].copy()
         frame["date"] = pd.to_datetime(frame["trade_date"], format="%Y%m%d", errors="coerce")
         frame["close"] = pd.to_numeric(frame["close"], errors="coerce")
-        frame = frame.dropna(subset=["date", "close"]).sort_values("date")
+        frame = frame.dropna(subset=["date", "close"]).sort_values("date").drop_duplicates("date", keep="last")
         if frame.empty:
+            per_index[symbol] = {"status": "failed", "error": "market.csv中没有该指数行情"}
             continue
-        weekly = frame.set_index("date")["close"].resample("W-FRI").last().dropna().to_frame("close")
+
+        # Group by Friday-ending week, but preserve the actual last trading date.
+        frame["week_bucket"] = frame["date"].dt.to_period("W-FRI")
+        weekly = frame.groupby("week_bucket", as_index=False).tail(1).copy()
+        weekly = weekly[["date", "close"]].sort_values("date")
         weekly["ma10w"] = weekly["close"].rolling(10, min_periods=10).mean()
         weekly["ma20w"] = weekly["close"].rolling(20, min_periods=20).mean()
         weekly["dev10w_pct"] = (weekly["close"] / weekly["ma10w"] - 1) * 100
         weekly["dev20w_pct"] = (weekly["close"] / weekly["ma20w"] - 1) * 100
-        weekly = weekly.reset_index().rename(columns={"date": "week_date"})
-        weekly["trade_date"] = weekly["week_date"].dt.strftime("%Y%m%d")
+        weekly["trade_date"] = weekly["date"].dt.strftime("%Y%m%d")
         weekly["symbol"] = symbol
         weekly["name"] = name
-        weekly["source"] = "公开指数日线计算（周五收盘/当周最后交易日）"
+        weekly["source"] = "公开指数日线计算（当周最后实际交易日）"
         rows.append(weekly[[
             "trade_date", "symbol", "name", "close", "ma10w", "ma20w",
             "dev10w_pct", "dev20w_pct", "source",
         ]])
+        per_index[symbol] = {
+            "status": "success",
+            "rows": len(weekly),
+            "latest_date": str(weekly["trade_date"].max()),
+        }
     if not rows:
         raise RuntimeError("没有足够指数数据计算偏离度")
     new = pd.concat(rows, ignore_index=True)
@@ -290,6 +311,7 @@ def update_deviation(settings: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         "latest_date": _latest_value(new, "trade_date"),
         "total_cached_rows": len(new),
         "method": "(指数收盘/10周或20周均线-1)×100%",
+        "indices": per_index,
     }
 
 

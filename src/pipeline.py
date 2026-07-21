@@ -140,14 +140,20 @@ def update_market(settings: dict[str, Any]) -> tuple[int, dict[str, Any]]:
 
 
 def update_global_macro(settings: dict[str, Any]) -> tuple[int, dict[str, Any]]:
-    new = FredTreasuryProvider().fetch(settings.get("fred_start_date", "20000101"))
+    new, details = FredTreasuryProvider().fetch_with_details(settings.get("fred_start_date", "20000101"))
     old = read_csv_safe(GLOBAL_MACRO_PATH)
     merged = _merge_history(old, new, ["trade_date", "series"])
     write_csv_atomic(merged, GLOBAL_MACRO_PATH)
+    latest_by_series = {}
+    for series in ["DGS2", "DGS10"]:
+        part = merged[merged["series"] == series] if "series" in merged.columns else pd.DataFrame()
+        latest_by_series[series] = _latest_value(part, "trade_date")
     return len(new), {
         "latest_date": _latest_value(merged, "trade_date"),
         "total_cached_rows": len(merged),
-        "source": "美联储H.15 / FRED",
+        "source_details": details,
+        "latest_by_series": latest_by_series,
+        "note": "DGS10独立抓取；DGS2失败不会阻止美国10年期国债收益率更新。",
     }
 
 

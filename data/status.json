@@ -66,55 +66,55 @@
     },
     "market": {
       "status": "success",
-      "rows": 32490,
-      "started_at": "2026-07-23T15:45:56+08:00",
-      "finished_at": "2026-07-23T15:46:05+08:00",
+      "rows": 32505,
+      "started_at": "2026-07-23T23:46:14+08:00",
+      "finished_at": "2026-07-23T23:46:26+08:00",
       "latest_date": "20260723",
-      "total_cached_rows": 32491,
+      "total_cached_rows": 32508,
       "symbols": {
         "000001.SH": {
           "status": "success",
-          "rows": 1587,
+          "rows": 1588,
           "source": "新浪财经 / AKShare"
         },
         "399001.SZ": {
           "status": "success",
-          "rows": 1587,
+          "rows": 1588,
           "source": "新浪财经 / AKShare"
         },
         "399006.SZ": {
           "status": "success",
-          "rows": 1587,
+          "rows": 1588,
           "source": "新浪财经 / AKShare"
         },
         "000300.SH": {
           "status": "success",
-          "rows": 1587,
+          "rows": 1588,
           "source": "新浪财经 / AKShare"
         },
         "000688.SH": {
           "status": "success",
-          "rows": 1587,
+          "rows": 1588,
           "source": "新浪财经 / AKShare"
         },
         "931087.CSI": {
           "status": "success",
-          "rows": 1588,
+          "rows": 1589,
           "source": "中证指数官网 / AKShare"
         },
         "^IXIC": {
           "status": "success",
-          "rows": 1646,
+          "rows": 1647,
           "source": "Yahoo Finance / yfinance"
         },
         "^GSPC": {
           "status": "success",
-          "rows": 1646,
+          "rows": 1647,
           "source": "Yahoo Finance / yfinance"
         },
         "^DJI": {
           "status": "success",
-          "rows": 1646,
+          "rows": 1647,
           "source": "Yahoo Finance / yfinance"
         },
         "DX-Y.NYB": {
@@ -124,56 +124,56 @@
         },
         "AAPL": {
           "status": "success",
-          "rows": 1646,
+          "rows": 1647,
           "source": "Yahoo Finance / yfinance"
         },
         "MSFT": {
           "status": "success",
-          "rows": 1646,
+          "rows": 1647,
           "source": "Yahoo Finance / yfinance"
         },
         "NVDA": {
           "status": "success",
-          "rows": 1646,
+          "rows": 1647,
           "source": "Yahoo Finance / yfinance"
         },
         "AMZN": {
           "status": "success",
-          "rows": 1646,
+          "rows": 1647,
           "source": "Yahoo Finance / yfinance"
         },
         "GOOGL": {
           "status": "success",
-          "rows": 1646,
+          "rows": 1647,
           "source": "Yahoo Finance / yfinance"
         },
         "META": {
           "status": "success",
-          "rows": 1646,
+          "rows": 1647,
           "source": "Yahoo Finance / yfinance"
         },
         "TSLA": {
           "status": "success",
-          "rows": 1646,
+          "rows": 1647,
           "source": "Yahoo Finance / yfinance"
         },
         "MU": {
           "status": "success",
-          "rows": 1646,
+          "rows": 1647,
           "source": "Yahoo Finance / yfinance"
         },
         "005930.KS": {
           "status": "success",
-          "rows": 1606,
+          "rows": 1605,
           "source": "Yahoo Finance / yfinance"
         },
         "000660.KS": {
           "status": "success",
-          "rows": 1606,
+          "rows": 1605,
           "source": "Yahoo Finance / yfinance"
         }
       },
-      "cached_rows": 32491
+      "cached_rows": 32508
     },
     "global_macro": {
       "status": "success",
@@ -213,15 +213,15 @@
     },
     "valuation": {
       "status": "success",
-      "rows": 23258,
-      "started_at": "2026-07-22T23:22:25+08:00",
-      "finished_at": "2026-07-22T23:22:53+08:00",
-      "latest_date": "20260722",
-      "total_cached_rows": 23258,
+      "rows": 23263,
+      "started_at": "2026-07-23T23:46:26+08:00",
+      "finished_at": "2026-07-23T23:46:47+08:00",
+      "latest_date": "20260723",
+      "total_cached_rows": 23263,
       "indices": {
         "000001.SH": {
           "status": "success",
-          "rows": 5478,
+          "rows": 5479,
           "source": "中证指数官网 / AKShare"
         },
         "399001.SZ": {
@@ -234,77 +234,77 @@
         },
         "000688.SH": {
           "status": "success",
-          "rows": 1589,
+          "rows": 1590,
           "source": "中证指数官网 / AKShare"
         },
         "000016.SH": {
           "status": "success",
-          "rows": 5478,
+          "rows": 5479,
           "source": "中证指数官网 / AKShare"
         },
         "000300.SH": {
           "status": "success",
-          "rows": 5477,
+          "rows": 5478,
           "source": "中证指数官网 / AKShare"
         },
         "000905.SH": {
           "status": "success",
-          "rows": 5236,
+          "rows": 5237,
           "source": "中证指数官网 / AKShare"
         }
       },
-      "cached_rows": 23258
+      "cached_rows": 23263
     },
     "sentiment": {
       "status": "success",
       "rows": 2,
-      "started_at": "2026-07-22T23:22:53+08:00",
-      "finished_at": "2026-07-22T23:26:44+08:00",
-      "latest_date": "20260722",
-      "crowding_cached_rows": 2,
-      "breadth_cached_rows": 2,
+      "started_at": "2026-07-23T23:46:47+08:00",
+      "finished_at": "2026-07-23T23:49:14+08:00",
+      "latest_date": "20260723",
+      "crowding_cached_rows": 3,
+      "breadth_cached_rows": 3,
       "leverage": {
         "status": "success",
         "rows": 1,
-        "latest_date": "20260721",
+        "latest_date": "20260722",
         "source": "上交所融资融券汇总 + 深交所融资融券汇总"
       },
-      "source": "东方财富沪深京A股实时行情 / AKShare",
+      "source": "新浪沪深京A股实时行情 / AKShare",
       "snapshot_kind": "收盘后快照"
     },
     "deviation": {
       "status": "success",
       "rows": 1680,
-      "started_at": "2026-07-23T15:55:18+08:00",
-      "finished_at": "2026-07-23T15:55:19+08:00",
-      "latest_date": "20260722",
+      "started_at": "2026-07-23T23:49:14+08:00",
+      "finished_at": "2026-07-23T23:49:14+08:00",
+      "latest_date": "20260723",
       "total_cached_rows": 1680,
       "method": "(指数收盘/10周或20周均线-1)×100%",
       "indices": {
         "000001.SH": {
           "status": "success",
           "rows": 336,
-          "latest_date": "20260722"
+          "latest_date": "20260723"
         },
         "399001.SZ": {
           "status": "success",
           "rows": 336,
-          "latest_date": "20260722"
+          "latest_date": "20260723"
         },
         "399006.SZ": {
           "status": "success",
           "rows": 336,
-          "latest_date": "20260722"
+          "latest_date": "20260723"
         },
         "000688.SH": {
           "status": "success",
           "rows": 336,
-          "latest_date": "20260722"
+          "latest_date": "20260723"
         },
         "000300.SH": {
           "status": "success",
           "rows": 336,
-          "latest_date": "20260722"
+          "latest_date": "20260723"
         }
       },
       "cached_rows": 1680
@@ -322,23 +322,23 @@
     "crowding": {
       "status": "cached",
       "rows": 0,
-      "cached_rows": 2,
+      "cached_rows": 3,
       "latest_date": "20260721"
     },
     "breadth": {
       "status": "cached",
       "rows": 0,
-      "cached_rows": 2,
+      "cached_rows": 3,
       "latest_date": "20260721"
     },
     "leverage": {
       "status": "cached",
       "rows": 0,
-      "cached_rows": 2,
+      "cached_rows": 3,
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-07-23T18:37:32+08:00",
+  "updated_at": "2026-07-23T23:46:14+08:00",
   "overall_status": "success",
-  "last_update_mode": "macro"
+  "last_update_mode": "close"
 }

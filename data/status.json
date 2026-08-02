@@ -67,8 +67,8 @@
     "market": {
       "status": "success",
       "rows": 32627,
-      "started_at": "2026-08-01T15:38:18+08:00",
-      "finished_at": "2026-08-01T15:38:27+08:00",
+      "started_at": "2026-08-02T15:41:47+08:00",
+      "finished_at": "2026-08-02T15:41:57+08:00",
       "latest_date": "20260731",
       "total_cached_rows": 32628,
       "symbols": {
@@ -178,8 +178,8 @@
     "global_macro": {
       "status": "success",
       "rows": 2,
-      "started_at": "2026-08-01T15:38:27+08:00",
-      "finished_at": "2026-08-01T15:47:41+08:00",
+      "started_at": "2026-08-02T15:41:57+08:00",
+      "finished_at": "2026-08-02T15:51:10+08:00",
       "latest_date": "20260730",
       "total_cached_rows": 20,
       "source_details": {
@@ -268,8 +268,8 @@
     "deviation": {
       "status": "success",
       "rows": 1685,
-      "started_at": "2026-08-01T15:47:41+08:00",
-      "finished_at": "2026-08-01T15:47:41+08:00",
+      "started_at": "2026-08-02T15:51:10+08:00",
+      "finished_at": "2026-08-02T15:51:10+08:00",
       "latest_date": "20260731",
       "total_cached_rows": 1685,
       "method": "(指数收盘/10周或20周均线-1)×100%",
@@ -331,7 +331,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-08-01T22:48:04+08:00",
+  "updated_at": "2026-08-02T15:41:47+08:00",
   "overall_status": "success",
-  "last_update_mode": "evening"
+  "last_update_mode": "global"
 }

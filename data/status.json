@@ -3,16 +3,16 @@
   "datasets": {
     "macro": {
       "status": "success",
-      "rows": 169,
-      "started_at": "2026-08-06T19:08:39+08:00",
-      "finished_at": "2026-08-06T19:09:03+08:00",
-      "latest_date": "202607",
-      "total_cached_rows": 169,
+      "rows": 170,
+      "started_at": "2026-09-06T01:04:27+08:00",
+      "finished_at": "2026-09-06T01:04:45+08:00",
+      "latest_date": "202608",
+      "total_cached_rows": 170,
       "source_details": {
         "components": {
           "money_supply": {
             "status": "success",
-            "rows": 168,
+            "rows": 169,
             "source": "东方财富 / AKShare"
           },
           "social_financing": {
@@ -22,17 +22,17 @@
           },
           "social_financing_stock": {
             "status": "success",
-            "rows": 6,
+            "rows": 7,
             "source": "中国人民银行官方社会融资规模存量统计表"
           },
           "pmi": {
             "status": "success",
-            "rows": 169,
+            "rows": 170,
             "source": "东方财富 / AKShare"
           },
           "cpi": {
             "status": "success",
-            "rows": 168,
+            "rows": 169,
             "source": "东方财富 / AKShare"
           }
         },
@@ -40,19 +40,19 @@
           "人民银行社融存量部分年份失败: 2022: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2022ntjsj/shrzgm/index.html') | 2023: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2023ntjsj/shrzgm/index.html') | 2024: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2024ntjsj/shrzgm/index.html') | 2025: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2025ntjsj/shrzgm/index.html')"
         ]
       },
-      "cached_rows": 169
+      "cached_rows": 170
     },
     "liquidity": {
       "status": "success",
-      "rows": 4953,
-      "started_at": "2026-08-06T19:09:03+08:00",
-      "finished_at": "2026-08-06T19:09:18+08:00",
-      "latest_date": "20260806",
-      "total_cached_rows": 4953,
+      "rows": 4974,
+      "started_at": "2026-09-06T01:04:45+08:00",
+      "finished_at": "2026-09-06T01:05:04+08:00",
+      "latest_date": "20260904",
+      "total_cached_rows": 4974,
       "source_details": {
         "shibor_on": {
           "status": "success",
-          "rows": 4953,
+          "rows": 4974,
           "source": "中国货币网 / AKShare"
         },
         "dr": {
@@ -62,7 +62,7 @@
         }
       },
       "note": "DR来自中国货币网，严格不以FDR替代。",
-      "cached_rows": 4953
+      "cached_rows": 4974
     },
     "market": {
       "status": "success",
@@ -305,9 +305,9 @@
     "fund_subscription": {
       "status": "success",
       "rows": 300,
-      "started_at": "2026-08-06T00:24:49+08:00",
-      "finished_at": "2026-08-06T00:25:03+08:00",
-      "latest_date": "20260729",
+      "started_at": "2026-09-06T01:05:04+08:00",
+      "finished_at": "2026-09-06T01:05:11+08:00",
+      "latest_date": "20260901",
       "total_cached_rows": 300,
       "note": "公开字段为募集份额（亿份）；按基金常见初始面值1元/份近似展示募集规模（亿元），并非基金存续期每日净申购额。",
       "cached_rows": 300
@@ -331,7 +331,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-08-06T19:08:39+08:00",
+  "updated_at": "2026-09-06T01:04:27+08:00",
   "overall_status": "success",
-  "last_update_mode": "macro"
+  "last_update_mode": "evening"
 }

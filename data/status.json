@@ -4,8 +4,8 @@
     "macro": {
       "status": "success",
       "rows": 170,
-      "started_at": "2026-09-07T15:17:17+08:00",
-      "finished_at": "2026-09-07T15:17:36+08:00",
+      "started_at": "2026-09-08T00:02:25+08:00",
+      "finished_at": "2026-09-08T00:02:46+08:00",
       "latest_date": "202608",
       "total_cached_rows": 170,
       "source_details": {
@@ -45,8 +45,8 @@
     "liquidity": {
       "status": "success",
       "rows": 4975,
-      "started_at": "2026-09-07T15:17:36+08:00",
-      "finished_at": "2026-09-07T15:17:50+08:00",
+      "started_at": "2026-09-08T00:02:46+08:00",
+      "finished_at": "2026-09-08T00:03:01+08:00",
       "latest_date": "20260907",
       "total_cached_rows": 4975,
       "source_details": {
@@ -312,8 +312,8 @@
     "fund_subscription": {
       "status": "success",
       "rows": 300,
-      "started_at": "2026-09-06T21:48:30+08:00",
-      "finished_at": "2026-09-06T21:48:35+08:00",
+      "started_at": "2026-09-08T00:03:01+08:00",
+      "finished_at": "2026-09-08T00:03:08+08:00",
       "latest_date": "20260901",
       "total_cached_rows": 300,
       "note": "公开字段为募集份额（亿份）；按基金常见初始面值1元/份近似展示募集规模（亿元），并非基金存续期每日净申购额。",
@@ -338,7 +338,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-09-07T22:25:23+08:00",
+  "updated_at": "2026-09-08T00:02:25+08:00",
   "overall_status": "success",
-  "last_update_mode": "close"
+  "last_update_mode": "evening"
 }

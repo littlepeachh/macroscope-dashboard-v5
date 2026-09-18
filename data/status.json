@@ -66,11 +66,11 @@
     },
     "market": {
       "status": "success",
-      "rows": 33293,
-      "started_at": "2026-09-17T21:45:10+08:00",
-      "finished_at": "2026-09-17T21:45:18+08:00",
-      "latest_date": "20260917",
-      "total_cached_rows": 33297,
+      "rows": 33287,
+      "started_at": "2026-09-18T08:27:18+08:00",
+      "finished_at": "2026-09-18T08:27:28+08:00",
+      "latest_date": "20260918",
+      "total_cached_rows": 33299,
       "symbols": {
         "000001.SH": {
           "status": "success",
@@ -124,69 +124,69 @@
         },
         "AAPL": {
           "status": "success",
-          "rows": 1686,
+          "rows": 1685,
           "source": "Yahoo Finance / yfinance"
         },
         "MSFT": {
           "status": "success",
-          "rows": 1686,
+          "rows": 1685,
           "source": "Yahoo Finance / yfinance"
         },
         "NVDA": {
           "status": "success",
-          "rows": 1686,
+          "rows": 1685,
           "source": "Yahoo Finance / yfinance"
         },
         "AMZN": {
           "status": "success",
-          "rows": 1686,
+          "rows": 1685,
           "source": "Yahoo Finance / yfinance"
         },
         "GOOGL": {
           "status": "success",
-          "rows": 1686,
+          "rows": 1685,
           "source": "Yahoo Finance / yfinance"
         },
         "META": {
           "status": "success",
-          "rows": 1686,
+          "rows": 1685,
           "source": "Yahoo Finance / yfinance"
         },
         "TSLA": {
           "status": "success",
-          "rows": 1686,
+          "rows": 1685,
           "source": "Yahoo Finance / yfinance"
         },
         "MU": {
           "status": "success",
-          "rows": 1686,
+          "rows": 1685,
           "source": "Yahoo Finance / yfinance"
         },
         "005930.KS": {
           "status": "success",
-          "rows": 1645,
+          "rows": 1646,
           "source": "Yahoo Finance / yfinance"
         },
         "000660.KS": {
           "status": "success",
-          "rows": 1645,
+          "rows": 1646,
           "source": "Yahoo Finance / yfinance"
         }
       },
-      "cached_rows": 33297
+      "cached_rows": 33299
     },
     "global_macro": {
       "status": "success",
       "rows": 2,
-      "started_at": "2026-09-17T08:38:29+08:00",
-      "finished_at": "2026-09-17T08:47:43+08:00",
-      "latest_date": "20260915",
-      "total_cached_rows": 42,
+      "started_at": "2026-09-18T08:27:28+08:00",
+      "finished_at": "2026-09-18T08:36:41+08:00",
+      "latest_date": "20260916",
+      "total_cached_rows": 44,
       "source_details": {
         "DGS2": {
           "status": "success",
           "rows": 1,
-          "latest_date": "20260915",
+          "latest_date": "20260916",
           "source": "美联储H.15当前发布页",
           "fallback_errors": [
             "FRED CSV: ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=45)\"))",
@@ -196,7 +196,7 @@
         "DGS10": {
           "status": "success",
           "rows": 1,
-          "latest_date": "20260915",
+          "latest_date": "20260916",
           "source": "美联储H.15当前发布页",
           "fallback_errors": [
             "FRED CSV: ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=45)\"))",
@@ -205,11 +205,11 @@
         }
       },
       "latest_by_series": {
-        "DGS2": "20260915",
-        "DGS10": "20260915"
+        "DGS2": "20260916",
+        "DGS10": "20260916"
       },
       "note": "DGS10独立抓取；DGS2失败不会阻止美国10年期国债收益率更新。",
-      "cached_rows": 42
+      "cached_rows": 44
     },
     "valuation": {
       "status": "success",
@@ -275,8 +275,8 @@
     "deviation": {
       "status": "success",
       "rows": 1720,
-      "started_at": "2026-09-17T21:47:47+08:00",
-      "finished_at": "2026-09-17T21:47:48+08:00",
+      "started_at": "2026-09-18T08:36:41+08:00",
+      "finished_at": "2026-09-18T08:36:41+08:00",
       "latest_date": "20260917",
       "total_cached_rows": 1720,
       "method": "(指数收盘/10周或20周均线-1)×100%",
@@ -338,7 +338,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-09-17T23:18:11+08:00",
+  "updated_at": "2026-09-18T08:27:18+08:00",
   "overall_status": "success",
-  "last_update_mode": "evening"
+  "last_update_mode": "global"
 }

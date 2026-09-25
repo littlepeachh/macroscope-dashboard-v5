@@ -66,11 +66,11 @@
     },
     "market": {
       "status": "success",
-      "rows": 33379,
-      "started_at": "2026-09-25T08:36:19+08:00",
-      "finished_at": "2026-09-25T08:36:29+08:00",
-      "latest_date": "20260924",
-      "total_cached_rows": 33396,
+      "rows": 33403,
+      "started_at": "2026-09-25T22:08:09+08:00",
+      "finished_at": "2026-09-25T22:08:23+08:00",
+      "latest_date": "20260925",
+      "total_cached_rows": 33408,
       "symbols": {
         "000001.SH": {
           "status": "success",
@@ -104,62 +104,62 @@
         },
         "^IXIC": {
           "status": "success",
-          "rows": 1690,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         },
         "^GSPC": {
           "status": "success",
-          "rows": 1690,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         },
         "^DJI": {
           "status": "success",
-          "rows": 1690,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         },
         "DX-Y.NYB": {
           "status": "success",
-          "rows": 1692,
+          "rows": 1694,
           "source": "Yahoo Finance / yfinance"
         },
         "AAPL": {
           "status": "success",
-          "rows": 1690,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         },
         "MSFT": {
           "status": "success",
-          "rows": 1690,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         },
         "NVDA": {
           "status": "success",
-          "rows": 1690,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         },
         "AMZN": {
           "status": "success",
-          "rows": 1690,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         },
         "GOOGL": {
           "status": "success",
-          "rows": 1690,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         },
         "META": {
           "status": "success",
-          "rows": 1690,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         },
         "TSLA": {
           "status": "success",
-          "rows": 1690,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         },
         "MU": {
           "status": "success",
-          "rows": 1690,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         },
         "005930.KS": {
@@ -173,7 +173,7 @@
           "source": "Yahoo Finance / yfinance"
         }
       },
-      "cached_rows": 33396
+      "cached_rows": 33408
     },
     "global_macro": {
       "status": "success",
@@ -214,8 +214,8 @@
     "valuation": {
       "status": "success",
       "rows": 23488,
-      "started_at": "2026-09-24T21:45:37+08:00",
-      "finished_at": "2026-09-24T21:46:05+08:00",
+      "started_at": "2026-09-25T22:08:23+08:00",
+      "finished_at": "2026-09-25T22:08:49+08:00",
       "latest_date": "20260924",
       "total_cached_rows": 23488,
       "indices": {
@@ -258,8 +258,8 @@
     "sentiment": {
       "status": "success",
       "rows": 2,
-      "started_at": "2026-09-24T21:46:05+08:00",
-      "finished_at": "2026-09-24T21:48:00+08:00",
+      "started_at": "2026-09-25T22:08:49+08:00",
+      "finished_at": "2026-09-25T22:10:33+08:00",
       "latest_date": "20260924",
       "crowding_cached_rows": 19,
       "breadth_cached_rows": 19,
@@ -275,8 +275,8 @@
     "deviation": {
       "status": "success",
       "rows": 1725,
-      "started_at": "2026-09-25T08:45:44+08:00",
-      "finished_at": "2026-09-25T08:45:44+08:00",
+      "started_at": "2026-09-25T22:10:33+08:00",
+      "finished_at": "2026-09-25T22:10:33+08:00",
       "latest_date": "20260924",
       "total_cached_rows": 1725,
       "method": "(指数收盘/10周或20周均线-1)×100%",
@@ -338,7 +338,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-09-25T15:42:27+08:00",
+  "updated_at": "2026-09-25T22:08:09+08:00",
   "overall_status": "success",
-  "last_update_mode": "macro"
+  "last_update_mode": "close"
 }

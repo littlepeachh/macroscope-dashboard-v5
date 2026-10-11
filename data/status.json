@@ -4,8 +4,8 @@
     "macro": {
       "status": "success",
       "rows": 171,
-      "started_at": "2026-10-10T23:57:14+08:00",
-      "finished_at": "2026-10-10T23:57:38+08:00",
+      "started_at": "2026-10-11T16:43:22+08:00",
+      "finished_at": "2026-10-11T16:43:40+08:00",
       "latest_date": "202609",
       "total_cached_rows": 171,
       "source_details": {
@@ -45,8 +45,8 @@
     "liquidity": {
       "status": "success",
       "rows": 4995,
-      "started_at": "2026-10-10T23:57:38+08:00",
-      "finished_at": "2026-10-10T23:57:57+08:00",
+      "started_at": "2026-10-11T16:43:40+08:00",
+      "finished_at": "2026-10-11T16:43:58+08:00",
       "latest_date": "20261010",
       "total_cached_rows": 4995,
       "source_details": {
@@ -338,7 +338,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-10-11T09:03:18+08:00",
+  "updated_at": "2026-10-11T16:43:22+08:00",
   "overall_status": "success",
-  "last_update_mode": "global"
+  "last_update_mode": "macro"
 }

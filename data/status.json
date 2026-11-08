@@ -66,9 +66,9 @@
     },
     "market": {
       "status": "success",
-      "rows": 33968,
-      "started_at": "2026-11-07T10:00:21+08:00",
-      "finished_at": "2026-11-07T10:00:29+08:00",
+      "rows": 33969,
+      "started_at": "2026-11-08T09:30:05+08:00",
+      "finished_at": "2026-11-08T09:30:15+08:00",
       "latest_date": "20261106",
       "total_cached_rows": 33979,
       "symbols": {
@@ -149,7 +149,7 @@
         },
         "META": {
           "status": "success",
-          "rows": 1721,
+          "rows": 1722,
           "source": "Yahoo Finance / yfinance"
         },
         "TSLA": {
@@ -178,8 +178,8 @@
     "global_macro": {
       "status": "success",
       "rows": 2,
-      "started_at": "2026-11-07T10:00:29+08:00",
-      "finished_at": "2026-11-07T10:09:43+08:00",
+      "started_at": "2026-11-08T09:30:15+08:00",
+      "finished_at": "2026-11-08T09:39:29+08:00",
       "latest_date": "20261105",
       "total_cached_rows": 114,
       "source_details": {
@@ -268,8 +268,8 @@
     "deviation": {
       "status": "success",
       "rows": 1755,
-      "started_at": "2026-11-07T10:09:43+08:00",
-      "finished_at": "2026-11-07T10:09:43+08:00",
+      "started_at": "2026-11-08T09:39:29+08:00",
+      "finished_at": "2026-11-08T09:39:29+08:00",
       "latest_date": "20261106",
       "total_cached_rows": 1755,
       "method": "(指数收盘/10周或20周均线-1)×100%",
@@ -331,7 +331,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-11-08T00:37:17+08:00",
+  "updated_at": "2026-11-08T09:30:05+08:00",
   "overall_status": "success",
-  "last_update_mode": "evening"
+  "last_update_mode": "global"
 }

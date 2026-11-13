@@ -4,8 +4,8 @@
     "macro": {
       "status": "success",
       "rows": 171,
-      "started_at": "2026-11-13T02:34:21+08:00",
-      "finished_at": "2026-11-13T02:34:38+08:00",
+      "started_at": "2026-11-13T17:26:47+08:00",
+      "finished_at": "2026-11-13T17:28:07+08:00",
       "latest_date": "202609",
       "total_cached_rows": 171,
       "source_details": {
@@ -26,9 +26,10 @@
             "source": "中国人民银行官方社会融资规模存量统计表"
           },
           "pmi": {
-            "status": "success",
-            "rows": 171,
-            "source": "东方财富 / AKShare"
+            "status": "partial",
+            "rows": 184,
+            "source": "金十 / AKShare",
+            "note": "备用源仅含官方制造业PMI"
           },
           "cpi": {
             "status": "success",
@@ -37,32 +38,21 @@
           }
         },
         "messages": [
-          "人民银行社融存量部分年份失败: 2022: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2022ntjsj/shrzgm/index.html') | 2023: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2023ntjsj/shrzgm/index.html') | 2024: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2024ntjsj/shrzgm/index.html') | 2025: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2025ntjsj/shrzgm/index.html')"
+          "人民银行社融存量部分年份失败: 2022: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2022ntjsj/shrzgm/index.html') | 2023: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2023ntjsj/shrzgm/index.html') | 2024: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2024ntjsj/shrzgm/index.html') | 2025: HTTPError('404 Client Error: Not Found for url: https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2025ntjsj/shrzgm/index.html')",
+          "PMI: ChunkedEncodingError(ProtocolError('Response ended prematurely'))"
         ]
       },
       "cached_rows": 171
     },
     "liquidity": {
-      "status": "success",
-      "rows": 5019,
-      "started_at": "2026-11-13T02:34:38+08:00",
-      "finished_at": "2026-11-13T02:34:55+08:00",
+      "status": "failed",
+      "rows": 0,
+      "started_at": "2026-11-13T17:28:07+08:00",
+      "finished_at": "2026-11-13T17:29:37+08:00",
+      "error": "DataFetchError('DR与Shibor数据源均失败')",
+      "cached_rows": 5019,
       "latest_date": "20261112",
-      "total_cached_rows": 5019,
-      "source_details": {
-        "shibor_on": {
-          "status": "success",
-          "rows": 5019,
-          "source": "中国货币网 / AKShare"
-        },
-        "dr": {
-          "status": "failed",
-          "error": "DataFetchError('中国货币网未解析到DR001/DR007；严格不以FDR替代。')",
-          "note": "严格不使用FDR替代DR"
-        }
-      },
-      "note": "DR来自中国货币网，严格不以FDR替代。",
-      "cached_rows": 5019
+      "serving_cached_data": true
     },
     "market": {
       "status": "success",
@@ -331,7 +321,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-11-13T10:41:13+08:00",
-  "overall_status": "success",
-  "last_update_mode": "global"
+  "updated_at": "2026-11-13T17:26:47+08:00",
+  "overall_status": "partial",
+  "last_update_mode": "macro"
 }

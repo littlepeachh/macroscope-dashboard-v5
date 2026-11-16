@@ -55,11 +55,11 @@
     },
     "market": {
       "status": "success",
-      "rows": 24090,
-      "started_at": "2026-11-15T09:59:14+08:00",
-      "finished_at": "2026-11-15T09:59:35+08:00",
-      "latest_date": "20261113",
-      "total_cached_rows": 34078,
+      "rows": 24093,
+      "started_at": "2026-11-16T10:14:25+08:00",
+      "finished_at": "2026-11-16T10:14:49+08:00",
+      "latest_date": "20261116",
+      "total_cached_rows": 34081,
       "symbols": {
         "000001.SH": {
           "status": "failed",
@@ -102,7 +102,7 @@
         },
         "DX-Y.NYB": {
           "status": "success",
-          "rows": 1729,
+          "rows": 1730,
           "source": "Yahoo Finance / yfinance"
         },
         "AAPL": {
@@ -147,22 +147,22 @@
         },
         "005930.KS": {
           "status": "success",
-          "rows": 1682,
+          "rows": 1683,
           "source": "Yahoo Finance / yfinance"
         },
         "000660.KS": {
           "status": "success",
-          "rows": 1682,
+          "rows": 1683,
           "source": "Yahoo Finance / yfinance"
         }
       },
-      "cached_rows": 34078
+      "cached_rows": 34081
     },
     "global_macro": {
       "status": "success",
       "rows": 2,
-      "started_at": "2026-11-15T09:59:35+08:00",
-      "finished_at": "2026-11-15T10:08:48+08:00",
+      "started_at": "2026-11-16T10:14:49+08:00",
+      "finished_at": "2026-11-16T10:24:02+08:00",
       "latest_date": "20261112",
       "total_cached_rows": 122,
       "source_details": {
@@ -251,8 +251,8 @@
     "deviation": {
       "status": "success",
       "rows": 1760,
-      "started_at": "2026-11-15T10:08:48+08:00",
-      "finished_at": "2026-11-15T10:08:48+08:00",
+      "started_at": "2026-11-16T10:24:02+08:00",
+      "finished_at": "2026-11-16T10:24:02+08:00",
       "latest_date": "20261113",
       "total_cached_rows": 1760,
       "method": "(指数收盘/10周或20周均线-1)×100%",
@@ -314,7 +314,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-11-16T01:23:36+08:00",
-  "overall_status": "partial",
-  "last_update_mode": "evening"
+  "updated_at": "2026-11-16T10:14:25+08:00",
+  "overall_status": "success",
+  "last_update_mode": "global"
 }

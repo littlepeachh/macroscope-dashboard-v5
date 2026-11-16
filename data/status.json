@@ -55,11 +55,11 @@
     },
     "market": {
       "status": "success",
-      "rows": 24093,
-      "started_at": "2026-11-16T10:14:25+08:00",
-      "finished_at": "2026-11-16T10:14:49+08:00",
+      "rows": 24102,
+      "started_at": "2026-11-17T02:54:53+08:00",
+      "finished_at": "2026-11-17T02:55:15+08:00",
       "latest_date": "20261116",
-      "total_cached_rows": 34081,
+      "total_cached_rows": 34093,
       "symbols": {
         "000001.SH": {
           "status": "failed",
@@ -87,17 +87,17 @@
         },
         "^IXIC": {
           "status": "success",
-          "rows": 1727,
+          "rows": 1728,
           "source": "Yahoo Finance / yfinance"
         },
         "^GSPC": {
           "status": "success",
-          "rows": 1727,
+          "rows": 1728,
           "source": "Yahoo Finance / yfinance"
         },
         "^DJI": {
           "status": "success",
-          "rows": 1727,
+          "rows": 1728,
           "source": "Yahoo Finance / yfinance"
         },
         "DX-Y.NYB": {
@@ -107,56 +107,56 @@
         },
         "AAPL": {
           "status": "success",
-          "rows": 1727,
+          "rows": 1728,
           "source": "Yahoo Finance / yfinance"
         },
         "MSFT": {
           "status": "success",
-          "rows": 1727,
+          "rows": 1728,
           "source": "Yahoo Finance / yfinance"
         },
         "NVDA": {
           "status": "success",
-          "rows": 1727,
+          "rows": 1728,
           "source": "Yahoo Finance / yfinance"
         },
         "AMZN": {
           "status": "success",
-          "rows": 1727,
+          "rows": 1728,
           "source": "Yahoo Finance / yfinance"
         },
         "GOOGL": {
           "status": "success",
-          "rows": 1727,
+          "rows": 1728,
           "source": "Yahoo Finance / yfinance"
         },
         "META": {
           "status": "success",
-          "rows": 1727,
+          "rows": 1728,
           "source": "Yahoo Finance / yfinance"
         },
         "TSLA": {
           "status": "success",
-          "rows": 1727,
+          "rows": 1728,
           "source": "Yahoo Finance / yfinance"
         },
         "MU": {
           "status": "success",
-          "rows": 1727,
+          "rows": 1728,
           "source": "Yahoo Finance / yfinance"
         },
         "005930.KS": {
           "status": "success",
-          "rows": 1683,
+          "rows": 1682,
           "source": "Yahoo Finance / yfinance"
         },
         "000660.KS": {
           "status": "success",
-          "rows": 1683,
+          "rows": 1682,
           "source": "Yahoo Finance / yfinance"
         }
       },
-      "cached_rows": 34081
+      "cached_rows": 34093
     },
     "global_macro": {
       "status": "success",
@@ -196,53 +196,51 @@
     },
     "valuation": {
       "status": "success",
-      "rows": 23628,
-      "started_at": "2026-11-14T00:43:02+08:00",
-      "finished_at": "2026-11-14T00:43:31+08:00",
-      "latest_date": "20261111",
-      "total_cached_rows": 23628,
+      "rows": 762,
+      "started_at": "2026-11-17T02:55:15+08:00",
+      "finished_at": "2026-11-17T02:55:38+08:00",
+      "latest_date": "20261116",
+      "total_cached_rows": 23631,
       "indices": {
         "000001.SH": {
-          "status": "success",
-          "rows": 5552,
-          "source": "中证指数官网 / AKShare"
+          "status": "failed",
+          "error": "DataFetchError('估值数据失败: 中证指数: AttributeError(\\'stock_zh_index_hist_csindex 已在 1.20.44 更名为 index_hist_csindex，请改用 ak.index_hist_csindex；参数与返回的列也可能有调整，用 ak.interface_info(\"index_hist_csindex\") 查看。完整对照见 https://akshare.akfamily.xyz/changelog.html#changelog-rename\\') | 乐咕乐股: KeyError(\\'上证综指\\')')"
         },
         "399001.SZ": {
           "status": "failed",
-          "error": "DataFetchError(\"估值数据失败: 中证指数: ValueError('Length mismatch: Expected axis has 0 elements, new values have 16 elements') | 乐咕乐股: KeyError('深证成指')\")"
+          "error": "DataFetchError('估值数据失败: 中证指数: AttributeError(\\'stock_zh_index_hist_csindex 已在 1.20.44 更名为 index_hist_csindex，请改用 ak.index_hist_csindex；参数与返回的列也可能有调整，用 ak.interface_info(\"index_hist_csindex\") 查看。完整对照见 https://akshare.akfamily.xyz/changelog.html#changelog-rename\\') | 乐咕乐股: KeyError(\\'深证成指\\')')"
         },
         "399006.SZ": {
           "status": "failed",
-          "error": "DataFetchError(\"估值数据失败: 中证指数: ValueError('Length mismatch: Expected axis has 0 elements, new values have 16 elements') | 乐咕乐股: KeyError('创业板指')\")"
+          "error": "DataFetchError('估值数据失败: 中证指数: AttributeError(\\'stock_zh_index_hist_csindex 已在 1.20.44 更名为 index_hist_csindex，请改用 ak.index_hist_csindex；参数与返回的列也可能有调整，用 ak.interface_info(\"index_hist_csindex\") 查看。完整对照见 https://akshare.akfamily.xyz/changelog.html#changelog-rename\\') | 乐咕乐股: KeyError(\\'创业板指\\')')"
         },
         "000688.SH": {
-          "status": "success",
-          "rows": 1663,
-          "source": "中证指数官网 / AKShare"
+          "status": "failed",
+          "error": "DataFetchError('估值数据失败: 中证指数: AttributeError(\\'stock_zh_index_hist_csindex 已在 1.20.44 更名为 index_hist_csindex，请改用 ak.index_hist_csindex；参数与返回的列也可能有调整，用 ak.interface_info(\"index_hist_csindex\") 查看。完整对照见 https://akshare.akfamily.xyz/changelog.html#changelog-rename\\') | 乐咕乐股: KeyError(\\'科创50\\')')"
         },
         "000016.SH": {
           "status": "success",
-          "rows": 5552,
-          "source": "中证指数官网 / AKShare"
+          "rows": 263,
+          "source": "乐咕乐股 / AKShare"
         },
         "000300.SH": {
           "status": "success",
-          "rows": 5551,
-          "source": "中证指数官网 / AKShare"
+          "rows": 260,
+          "source": "乐咕乐股 / AKShare"
         },
         "000905.SH": {
           "status": "success",
-          "rows": 5310,
-          "source": "中证指数官网 / AKShare"
+          "rows": 239,
+          "source": "乐咕乐股 / AKShare"
         }
       },
-      "cached_rows": 23628
+      "cached_rows": 23631
     },
     "sentiment": {
       "status": "partial",
       "rows": 0,
-      "started_at": "2026-11-14T00:43:31+08:00",
-      "finished_at": "2026-11-14T00:43:31+08:00",
+      "started_at": "2026-11-17T02:55:38+08:00",
+      "finished_at": "2026-11-17T02:55:38+08:00",
       "latest_date": "20261030",
       "total_cached_rows": 34,
       "skipped": true,
@@ -251,8 +249,8 @@
     "deviation": {
       "status": "success",
       "rows": 1760,
-      "started_at": "2026-11-16T10:24:02+08:00",
-      "finished_at": "2026-11-16T10:24:02+08:00",
+      "started_at": "2026-11-17T02:55:38+08:00",
+      "finished_at": "2026-11-17T02:55:39+08:00",
       "latest_date": "20261113",
       "total_cached_rows": 1760,
       "method": "(指数收盘/10周或20周均线-1)×100%",
@@ -314,7 +312,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-11-16T17:31:24+08:00",
-  "overall_status": "partial",
-  "last_update_mode": "macro"
+  "updated_at": "2026-11-17T02:54:53+08:00",
+  "overall_status": "success",
+  "last_update_mode": "close"
 }

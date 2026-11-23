@@ -4,8 +4,8 @@
     "macro": {
       "status": "success",
       "rows": 171,
-      "started_at": "2026-11-23T02:01:16+08:00",
-      "finished_at": "2026-11-23T02:01:29+08:00",
+      "started_at": "2026-11-23T18:40:35+08:00",
+      "finished_at": "2026-11-23T18:40:49+08:00",
       "latest_date": "202609",
       "total_cached_rows": 171,
       "source_details": {
@@ -46,8 +46,8 @@
     "liquidity": {
       "status": "failed",
       "rows": 0,
-      "started_at": "2026-11-23T02:01:29+08:00",
-      "finished_at": "2026-11-23T02:01:33+08:00",
+      "started_at": "2026-11-23T18:40:49+08:00",
+      "finished_at": "2026-11-23T18:40:52+08:00",
       "error": "DataFetchError('DR与Shibor数据源均失败')",
       "cached_rows": 5020,
       "latest_date": "20261113",
@@ -312,7 +312,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-11-23T10:54:24+08:00",
-  "overall_status": "success",
-  "last_update_mode": "global"
+  "updated_at": "2026-11-23T18:40:35+08:00",
+  "overall_status": "partial",
+  "last_update_mode": "macro"
 }

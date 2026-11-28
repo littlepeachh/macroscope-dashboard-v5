@@ -55,9 +55,9 @@
     },
     "market": {
       "status": "success",
-      "rows": 24216,
-      "started_at": "2026-11-28T02:25:45+08:00",
-      "finished_at": "2026-11-28T02:26:05+08:00",
+      "rows": 24218,
+      "started_at": "2026-11-28T11:59:13+08:00",
+      "finished_at": "2026-11-28T11:59:35+08:00",
       "latest_date": "20261127",
       "total_cached_rows": 34209,
       "symbols": {
@@ -147,12 +147,12 @@
         },
         "005930.KS": {
           "status": "success",
-          "rows": 1691,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         },
         "000660.KS": {
           "status": "success",
-          "rows": 1691,
+          "rows": 1692,
           "source": "Yahoo Finance / yfinance"
         }
       },
@@ -161,15 +161,15 @@
     "global_macro": {
       "status": "success",
       "rows": 2,
-      "started_at": "2026-11-27T12:19:38+08:00",
-      "finished_at": "2026-11-27T12:28:52+08:00",
-      "latest_date": "20261124",
-      "total_cached_rows": 138,
+      "started_at": "2026-11-28T11:59:35+08:00",
+      "finished_at": "2026-11-28T12:08:48+08:00",
+      "latest_date": "20261125",
+      "total_cached_rows": 140,
       "source_details": {
         "DGS2": {
           "status": "success",
           "rows": 1,
-          "latest_date": "20261124",
+          "latest_date": "20261125",
           "source": "美联储H.15当前发布页",
           "fallback_errors": [
             "FRED CSV: ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=45)\"))",
@@ -179,7 +179,7 @@
         "DGS10": {
           "status": "success",
           "rows": 1,
-          "latest_date": "20261124",
+          "latest_date": "20261125",
           "source": "美联储H.15当前发布页",
           "fallback_errors": [
             "FRED CSV: ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=45)\"))",
@@ -188,11 +188,11 @@
         }
       },
       "latest_by_series": {
-        "DGS2": "20261124",
-        "DGS10": "20261124"
+        "DGS2": "20261125",
+        "DGS10": "20261125"
       },
       "note": "DGS10独立抓取；DGS2失败不会阻止美国10年期国债收益率更新。",
-      "cached_rows": 138
+      "cached_rows": 140
     },
     "valuation": {
       "status": "success",
@@ -249,8 +249,8 @@
     "deviation": {
       "status": "success",
       "rows": 1760,
-      "started_at": "2026-11-28T02:26:27+08:00",
-      "finished_at": "2026-11-28T02:26:27+08:00",
+      "started_at": "2026-11-28T12:08:48+08:00",
+      "finished_at": "2026-11-28T12:08:48+08:00",
       "latest_date": "20261113",
       "total_cached_rows": 1760,
       "method": "(指数收盘/10周或20周均线-1)×100%",
@@ -312,7 +312,7 @@
       "latest_date": "20260720"
     }
   },
-  "updated_at": "2026-11-28T03:38:39+08:00",
-  "overall_status": "partial",
-  "last_update_mode": "evening"
+  "updated_at": "2026-11-28T11:59:13+08:00",
+  "overall_status": "success",
+  "last_update_mode": "global"
 }
